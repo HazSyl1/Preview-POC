@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+artifacts/*
+!artifacts/
+artifacts/*
+!artifacts/conversion-report.md
+!artifacts/conversion-comparison.json
+.npm-cache/
