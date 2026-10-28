@@ -1,0 +1,414 @@
+PR REVIEW AGENT — PRESENTER SCRIPT
+15-Minute Talk · EPAM Everest
+====================================================================================================
+
+BEFORE YOU START — CHECKLIST
+------------------------------
+□ VS Code open
+□ .github/agents/ folder ready (empty — you'll create the file live)
+□ Azure DevOps open in browser — PR ready to review (note the PR ID)
+□ MCP server configured in settings.json (azure-devops-mcp connected)
+□ Copilot Chat panel open, switched to Agent Mode
+□ This script open on a second screen or printed
+
+====================================================================================================
+SECTION 1 — INTRODUCTION
+~ 1 minute
+====================================================================================================
+
+"So first of all, good evening everyone. And a very happy Gudi Padwa and Ugadi to all of you
+celebrating — hope it's been a good one.
+
+So, I'm Sarthak. I'm a Junior Software Engineer at EPAM. I joined last year as an intern out of
+Hyderabad and transitioned to a full-time role not too long after. I've been working with Everest
+ever since, building agents and tools on the AI SDLC side of things.
+
+So that's a little about me. Let me share my screen and we'll get into it."
+
+[SHARE SCREEN — VS Code visible]
+
+"What we'll do today is have a conversation about Agentic AI — and then we'll focus mostly on
+Copilot Agents and how to actually build one that you can use in your day-to-day work.
+
+By the end of this, you'll have seen a real agent run live, and you'll know exactly how to build
+your own."
+
+====================================================================================================
+SECTION 2 — WHAT IS AGENTIC AI?
+~ 2 minutes
+====================================================================================================
+
+"Let's start with a quick question. How many of you have used GitHub Copilot or ChatGPT to help
+with code?
+
+Great. So that's AI as a chat assistant — you ask, it answers, you do the rest.
+
+Agentic AI is a step change from that. Instead of answering a question, an agentic system takes
+a goal, breaks it into steps, uses tools to get things done, checks its own results, and keeps
+going until the task is complete. You're not driving anymore — you're directing.
+
+The classic analogy: it's like the difference between asking a colleague for advice versus handing
+a task to a capable junior developer and saying — here's the goal, come back when it's done.
+
+Now there are two main ways you can build agentic systems today.
+
+One is frameworks — things like LangGraph, AutoGen, CrewAI. You write the agent loop in code.
+You define the graph, the memory, how agents talk to each other. Full control, very powerful,
+but it takes real engineering effort to set up.
+
+The other is Copilot Agents — which is what we're doing today. And the reason I like these is
+that the entire agent is just a Markdown file. No code. No deployment. No infrastructure.
+You write plain English instructions, save the file in the right folder, and VS Code picks it
+up automatically.
+
+Both approaches support MCP, which I'll get to in a second. But for getting something useful
+running fast, Copilot Agents are where I'd tell anyone to start."
+
+====================================================================================================
+SECTION 3 — MCP & TOOLS (QUICK)
+~ 1 minute
+====================================================================================================
+
+"So — MCP. Model Context Protocol.
+
+I like to think of MCP as a plugin. You know how your browser has extensions that add
+capabilities? MCP does that for your AI agent. It gives the agent access to tools from
+external sources.
+
+And tools are just things the agent can do — call an API, read a file, search a codebase,
+post a comment. By default, Copilot in Agent Mode has some built-in tools. But with MCP,
+you can plug in anything. In our case today, we're connecting to Azure DevOps through the
+azure-devops-mcp server — which gives the agent tools to read PRs, fetch diffs, post comments,
+and more.
+
+One line in the agent file to declare it, one entry in settings.json to connect it. That's it."
+
+====================================================================================================
+SECTION 4 — THE PR REVIEW AGENT
+~ 1 minute
+====================================================================================================
+
+"So what are we actually building today?
+
+A PR Review Agent for Azure DevOps.
+
+The idea is simple: you open Copilot Chat in Agent Mode, type @pr-review and give it a PR ID,
+and it runs a structured 11-step review — checking correctness, security, performance, naming,
+tests, documentation — and then compiles a full report that it can post directly to the PR
+as a comment.
+
+The thing that I think makes this interesting is the human-in-the-loop design. This agent never
+does anything without asking you first. Before every single step, it tells you what it's about
+to do, which tool it will call, and what it will send. You say yes or no. You are always in
+control.
+
+PR operations are irreversible. So this is intentional.
+
+Let me build the agent file live so you can see exactly what goes in it — and then we'll run it."
+
+====================================================================================================
+SECTION 5 — LIVE BUILD (CREATE THE AGENT FILE)
+~ 3 minutes
+====================================================================================================
+
+[IN VS CODE — open terminal]
+
+"So let's build this. First thing — create the folder and file."
+
+[TYPE IN TERMINAL:]
+mkdir -p .github/agents
+code .github/agents/pr-review.agent.md
+
+"VS Code discovers any file in .github/agents/ that ends in .agent.md — automatically.
+No registration, no config. Just the file."
+
+[THE FILE WILL OPEN — START TYPING OR PASTE THE FOLLOWING SECTIONS ONE BY ONE]
+
+"First we write the frontmatter — this is the header of the file. Name, description,
+what tools it can use, and which MCP servers it connects to."
+
+[PASTE — explain each line as you paste:]
+
+---
+name: pr-review
+description: PR Review Agent for Azure DevOps — human-in-the-loop, structured review covering correctness, security, performance, naming, tests, and docs.
+argument-hint: Provide a PR ID to review (e.g. "review PR 1234") or say "list my PRs" to see open PRs.
+tools: [execute, read, search, 'microsoft/azure-devops-mcp/*']
+mcp-servers: ['azure-devops-mcp']
+---
+
+"Name and description — this is what shows up in the @ menu in Copilot Chat.
+Tools — what built-in capabilities it has access to.
+MCP servers — we're connecting to azure-devops-mcp here."
+
+[PASTE — Role section:]
+
+## Role
+
+You are a PR Review Agent connected to an Azure DevOps repository via the azure-devops-mcp MCP server.
+Your job is to review Pull Requests thoroughly before they get approved and merged.
+
+You are tech-stack agnostic. You adapt to whatever language, framework, and conventions the project uses.
+
+"This is the role. Plain English. You're just telling the agent who it is and what it does."
+
+[PASTE — Critical rule:]
+
+## CRITICAL RULE — HUMAN APPROVAL REQUIRED FOR EVERY ACTION
+
+You MUST follow this protocol at ALL times:
+1. NEVER execute any MCP tool or action without explicit human approval
+2. Before EVERY step, explain WHAT you're about to do, WHY, which tool you'll call, and WAIT for approval
+3. If the human says "no", "skip", or "stop" — OBEY
+4. NEVER auto-post comments, approve, reject, or modify anything on the PR without go-ahead
+
+Before every action, present this to the human:
+
+🔒 APPROVAL REQUIRED
+
+📌 Step:    [Step number and name]
+🔧 Action:  [What I want to do]
+🛠️ Tool:    [Exact MCP tool I will call]
+📋 Details: [Parameters or content I will send]
+
+Shall I proceed? (yes / no / skip / modify)
+
+"This is the most important section. Every single action requires a typed yes from me.
+This is how we keep humans in control of sensitive operations."
+
+[PASTE — Review steps:]
+
+## Review Steps
+
+### Step 1 — Understand the PR
+Fetch PR metadata (title, description, branches, author). Summarise what the PR does in 2–3 sentences.
+Flag if description is missing or vague. Flag if PR touches too many unrelated concerns.
+
+### Step 2 — Analyse the Diff
+List all changed files. Group by category: source, tests, config, docs.
+Flag files unrelated to the PR's stated purpose. Flag if diff is larger than 500 lines.
+
+### Step 3 — Check Code Correctness
+Check for bugs, logic errors, unhandled edge cases (null, empty, boundary values).
+Check error handling. Flag dead code, debug leftovers, hardcoded values.
+
+### Step 4 — Check Naming Conventions
+Sample existing files to detect project conventions.
+Flag anything that doesn't match how the project names variables, functions, classes, files.
+
+### Step 5 — Check Folder Structure
+Verify new files are in the correct location.
+Flag separation of concerns violations (e.g. business logic in a controller).
+
+### Step 6 — Performance & Security
+Performance: expensive ops in loops, N+1 queries, unbounded data fetching, missing pagination.
+Security: SQL injection, unsanitised input, hardcoded secrets, missing auth checks, sensitive data in logs.
+
+### Step 7 — Check Tests
+Verify tests exist for new or changed logic.
+Flag critical logic with no tests as MAJOR. Check coverage: happy path, edge cases, error cases.
+
+### Step 8 — Dependencies & Config
+Flag new packages. Check for known-vulnerable versions.
+Review config changes. Flag any secrets or credentials added.
+
+### Step 9 — Documentation
+Flag if README needs updating. Check inline comments on complex logic.
+Verify CHANGELOG updated if the project uses one.
+
+### Step 10 — Review Existing PR Comments
+Fetch existing threads on the PR. Do not re-raise issues already discussed and resolved.
+
+### Step 11 — Final Report & Action
+Compile all findings using the Final Summary Format.
+Ask the human what to do: post as PR comment, post to work item, or keep here.
+WAIT for human choice. Do NOT post anything automatically.
+
+"That's the 11 steps. Each one is plain English — the agent knows how to run them.
+Now the severity labels and the output format."
+
+[PASTE — Severity and output:]
+
+## Severity Labels
+
+🔴 CRITICAL — Security flaw, data loss risk, crash — BLOCKS approval
+🟠 MAJOR    — Bug, performance problem, design issue — BLOCKS approval
+🟡 MINOR    — Naming, readability, small refactor — does not block
+💡 SUGGESTION — Alternative approach, optional
+❓ QUESTION — Needs clarification from PR author
+♻️ NIT      — Typo, formatting, trivial
+🌟 PRAISE   — Good work worth highlighting (always include at least one)
+
+## Finding Format
+
+Every finding must use this format:
+
+[SEVERITY] — [Category]
+File: file/path:line_number
+
+Issue:         [What is wrong]
+Why:           [Why it matters]
+Suggested Fix: [How to fix — include a code snippet if possible]
+
+## Rules
+
+1. NEVER execute ANY action without human approval
+2. NEVER approve a PR that has CRITICAL findings
+3. Always adapt to the project's existing conventions
+4. Always include at least one PRAISE
+5. Review priority: Security > Correctness > Performance > Consistency > Readability
+6. Keep comments concise and actionable with code fix snippets where possible
+7. Always include required parameters when calling MCP tools — ask if missing
+
+"And that's the entire agent. Let me save this."
+
+[SAVE THE FILE — Ctrl+S]
+
+"Done. That file is now the agent. Let me show you what happens when I open Copilot Chat."
+
+====================================================================================================
+SECTION 6 — LIVE DEMO (RUN THE AGENT)
+~ 4 minutes
+====================================================================================================
+
+[OPEN COPILOT CHAT — Ctrl+Alt+I]
+[CONFIRM IT'S IN AGENT MODE — show the mode dropdown]
+
+"You can see I'm in Agent Mode here. Now I type @"
+
+[TYPE @ — show the dropdown]
+
+"And there it is — pr-review — right in the list. That's our agent. Appeared automatically
+because the file is in .github/agents/. No restart, no install."
+
+[SELECT @pr-review AND TYPE:]
+
+review PR [YOUR PR ID]
+
+[HIT ENTER]
+
+"It's going to ask me for the Azure DevOps details first — org, project, repo.
+This is a one-time thing per session."
+
+[PROVIDE ORG / PROJECT / REPO WHEN PROMPTED]
+
+"Now watch what it does before Step 1."
+
+[AGENT SHOWS APPROVAL PROMPT — READ IT OUT LOUD TO THE AUDIENCE]
+
+"See this — it's showing me exactly what it's about to do. Which tool it will call.
+What parameters it will send. Before it does anything. I type yes."
+
+[TYPE: yes]
+
+"And now it fetches the PR and summarises it. Title, branches, author — and a plain-English
+summary of what the PR actually does. Already useful. I didn't have to read the description."
+
+[APPROVE STEP 2 — DIFF ANALYSIS]
+
+"Step 2 — it wants to list the changed files. Yes."
+
+[TYPE: yes — SHOW THE FILE LIST]
+
+"Look at how it groups them — source code, tests, config. If anything unrelated snuck in,
+it flags it here. That's actually a very common issue in real PRs."
+
+[APPROVE STEP 3 — CORRECTNESS]
+
+"Step 3 — code correctness. This is the one reviewers most often rush. Yes."
+
+[TYPE: yes — WAIT FOR FINDINGS — READ OUT 1 OR 2]
+
+"Every finding has the same structure — what's wrong, why it matters, suggested fix with a
+code snippet. Actionable, not vague."
+
+[SKIP TO STEP 6 — TYPE IN CHAT:]
+
+skip to step 6
+
+"I'm going to jump to Step 6 — security and performance. This is usually where it gets
+interesting."
+
+[APPROVE STEP 6]
+
+[TYPE: yes — HIGHLIGHT ANY SECURITY FINDINGS — OR SHOW THE CATEGORIES IF CLEAN]
+
+"Even when it finds nothing, it's documented that the check was done. That matters for
+compliance and audit."
+
+[SKIP TO STEP 11 — TYPE IN CHAT:]
+
+skip to final report
+
+"And now the final report."
+
+[APPROVE — SCROLL THROUGH THE SUMMARY SLOWLY]
+
+"PR status, what it does, what must be fixed, what's optional, questions for the author,
+a checklist. Structured, shareable, actionable.
+
+And it's still waiting for me to tell it what to do. It hasn't touched Azure DevOps yet.
+I'll choose option 1 — post it as a PR comment."
+
+[TYPE: 1]
+
+[APPROVE THE FINAL POSTING STEP]
+
+[SHOW THE COMMENT IN AZURE DEVOPS]
+
+"And there it is — posted to the PR. Start to finish, under 2 minutes of agent runtime.
+And I approved every single action before it happened."
+
+====================================================================================================
+SECTION 7 — KEY TAKEAWAYS
+~ 1 minute
+====================================================================================================
+
+"So a few things I want you to leave with.
+
+Agentic AI takes goals, not instructions. That shift in how you think about automation is
+the most important thing here.
+
+Copilot Agents are just text files. No code, no deployment, no infra. You can build one
+this afternoon.
+
+MCP is the plugin system. One standard protocol to connect your agent to any external
+service — Azure DevOps, GitHub, Jira, whatever you need.
+
+Human-in-the-loop is a feature, not a limitation. For anything irreversible, design your
+agents to ask first.
+
+And the instructions are the product. The time you spend writing a clear, specific prompt
+is the time your team saves every week not fixing the agent's mistakes.
+
+What I showed you today took one afternoon to build. It's already in our repo and saving
+review time.
+
+If you want to build your own — come find me after the session. Happy to walk through it.
+
+Thank you."
+
+====================================================================================================
+QUICK REFERENCE — THINGS TO REMEMBER ON STAGE
+====================================================================================================
+
+If the agent doesn't appear in @ menu:
+→ Check the file is saved as .agent.md in .github/agents/
+→ Reload VS Code window: Ctrl+Shift+P → Developer: Reload Window
+
+If MCP disconnects during demo:
+→ Say: "Let me reconnect the MCP server quickly."
+→ Ctrl+Shift+P → type MCP → Restart MCP Server
+
+If you're running out of time:
+→ After Step 3, type in chat: skip to final report
+→ That takes you straight to the summary
+
+If the agent produces something unexpected:
+→ Say: "This is exactly why we have human approval — I'd catch this before it goes anywhere."
+→ Type: no — and explain what you'd change in the prompt
+
+Demo PR ID: _______________
+Org: _______________   Project: _______________   Repo: _______________
+
+====================================================================================================

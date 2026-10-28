@@ -1,0 +1,2 @@
+Text sample — streamed as plain text.
+No PDF conversion is needed.

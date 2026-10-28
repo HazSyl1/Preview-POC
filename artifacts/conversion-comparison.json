@@ -1,0 +1,173 @@
+{
+  "generatedAt": "2026-10-28T10:15:46.668Z",
+  "results": [
+    {
+      "name": "sample-word.docx",
+      "type": "DOCX",
+      "originalSizeBytes": 18147,
+      "html": {
+        "sizeBytes": 245831,
+        "conversionTimeMs": 1296,
+        "requestTimeMs": 1370,
+        "processed": 7,
+        "total": 7
+      },
+      "pdf": {
+        "sizeBytes": 69435,
+        "conversionTimeMs": 404,
+        "requestTimeMs": 423,
+        "pages": 7,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "React Boilerplate Walkthrough & Agent Overview.docx",
+      "type": "DOCX",
+      "originalSizeBytes": 1727782,
+      "html": {
+        "sizeBytes": 2964459,
+        "conversionTimeMs": 1760,
+        "requestTimeMs": 1798,
+        "processed": 21,
+        "total": 21
+      },
+      "pdf": {
+        "sizeBytes": 172498,
+        "conversionTimeMs": 940,
+        "requestTimeMs": 948,
+        "pages": 21,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "sample-excel.xlsx",
+      "type": "XLSX",
+      "originalSizeBytes": 8877,
+      "html": {
+        "sizeBytes": 7656,
+        "conversionTimeMs": 800,
+        "requestTimeMs": 804,
+        "processed": 3,
+        "total": 3
+      },
+      "pdf": {
+        "sizeBytes": 46680,
+        "conversionTimeMs": 196,
+        "requestTimeMs": 203,
+        "pages": 4,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "Excel-sample1.xlsx",
+      "type": "XLSX",
+      "originalSizeBytes": 41409,
+      "html": {
+        "sizeBytes": 138236,
+        "conversionTimeMs": 480,
+        "requestTimeMs": 488,
+        "processed": 2,
+        "total": 2
+      },
+      "pdf": {
+        "sizeBytes": 125582,
+        "conversionTimeMs": 318,
+        "requestTimeMs": 325,
+        "pages": 3,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "Excel-sample2.xlsx",
+      "type": "XLSX",
+      "originalSizeBytes": 38724,
+      "html": {
+        "sizeBytes": 72801,
+        "conversionTimeMs": 682,
+        "requestTimeMs": 686,
+        "processed": 5,
+        "total": 5
+      },
+      "pdf": {
+        "sizeBytes": 66532,
+        "conversionTimeMs": 112,
+        "requestTimeMs": 117,
+        "pages": 5,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "20mb.xlsx",
+      "type": "XLSX",
+      "originalSizeBytes": 20698416,
+      "html": {
+        "sizeBytes": 86547197,
+        "conversionTimeMs": 22066,
+        "requestTimeMs": 22939,
+        "processed": 1,
+        "total": 1
+      },
+      "pdf": {
+        "sizeBytes": 158533347,
+        "conversionTimeMs": 145878,
+        "requestTimeMs": 145898,
+        "pages": null,
+        "requestMode": "range (first byte)"
+      }
+    },
+    {
+      "name": "sample-slides.pptx",
+      "type": "PPTX",
+      "originalSizeBytes": 44049,
+      "html": {
+        "sizeBytes": 167339,
+        "conversionTimeMs": 1607,
+        "requestTimeMs": 1614,
+        "processed": 7,
+        "total": 7
+      },
+      "pdf": {
+        "sizeBytes": 71753,
+        "conversionTimeMs": 423,
+        "requestTimeMs": 429,
+        "pages": 7,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "AI-Hackathon-Proposal-Template-EPAM.pptx",
+      "type": "PPTX",
+      "originalSizeBytes": 4493071,
+      "html": {
+        "sizeBytes": 509795,
+        "conversionTimeMs": 1778,
+        "requestTimeMs": 1787,
+        "processed": 12,
+        "total": 12
+      },
+      "pdf": {
+        "sizeBytes": 375413,
+        "conversionTimeMs": 1312,
+        "requestTimeMs": 1359,
+        "pages": 12,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "40mb.xlsx",
+      "type": "XLSX",
+      "originalSizeBytes": 43380153,
+      "html": {
+        "error": "The full HTML export is 18,17,58,392 bytes, too large for this JSON preview. Use the PDF view for this file.",
+        "httpStatus": 413,
+        "requestTimeMs": 38886,
+        "generatedSizeBytes": 181758392
+      },
+      "pdf": {
+        "skipped": true,
+        "error": "Full PDF conversion skipped after the 40 MB trial failed above 7 GB of API working memory.",
+        "requestTimeMs": null
+      }
+    }
+  ]
+}

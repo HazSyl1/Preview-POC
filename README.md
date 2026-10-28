@@ -1,93 +1,139 @@
-# POC-Preview
+# File Preview POC
 
+React + ASP.NET Core proof of concept for previewing files stored in Azure Blob Storage. Office documents can be rendered as complete HTML or PDF previews using Aspose.
 
+Supported formats:
 
-## Getting started
+- Word: `.doc`, `.docx`
+- Excel: `.xls`, `.xlsx`
+- PowerPoint: `.ppt`, `.pptx`
+- PDF, common images, and text files
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## How it works
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Office files are loaded as streams by the ASP.NET backend and converted with the matching Aspose library. The HTML endpoint returns JSON containing generated HTML and conversion statistics. React renders the HTML in a sandboxed `iframe` using `srcDoc`. The PDF view uses the separate PDF streaming/conversion endpoint and `react-pdf`.
 
-## Add your files
+The HTML conversion exports the complete document: all Word pages, Excel worksheets, and PowerPoint slides. Large HTML responses are held in memory because the POC returns HTML inside JSON; outputs over 100 MiB return HTTP 413.
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## Prerequisites
 
+- .NET SDK 9
+- Node.js 22.13 or newer
+- A current browser
+- An Aspose license for production-quality output
+
+## Run with local samples
+
+The default configuration uses files in `backend/Preview.Api/samples`. No Azure account is required for the local demo.
+
+Terminal 1:
+
+```powershell
+cd backend/Preview.Api
+dotnet restore
+dotnet run --urls http://localhost:5050
 ```
-cd existing_repo
-git remote add origin https://git.epam.com/sarthak_ravindrachaure/poc-preview.git
-git branch -M main
-git push -uf origin main
+
+Terminal 2, from the repository root:
+
+```powershell
+npm install
+npm run dev -- --host 127.0.0.1
 ```
 
-## Integrate with your tools
+Open <http://127.0.0.1:5175> and select a sample file, enter a file name, or upload a local test file.
 
-* [Set up project integrations](https://git.epam.com/sarthak_ravindrachaure/poc-preview/-/settings/integrations)
+## Aspose license
 
-## Collaborate with your team
+Without a license, Aspose adds evaluation watermarks. Set the license path before starting the backend:
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+```powershell
+$env:Aspose__LicensePath="C:\path\to\Aspose.Total.lic"
+dotnet run --urls http://localhost:5050
+```
 
-## Test and Deploy
+Do not commit the license file.
 
-Use the built-in continuous integration in GitLab.
+## Azure Blob Storage
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
+Set both values before starting the backend:
 
-***
+```powershell
+$env:AzureStorage__ConnectionString="your-azure-blob-connection-string"
+$env:AzureStorage__ContainerName="your-container-name"
+$env:Aspose__LicensePath="C:\path\to\Aspose.Total.lic"
+dotnet run --urls http://localhost:5050
+```
 
-# Editing this README
+When Azure settings are present, the backend uses Azure Blob Storage instead of local samples. The local file list and upload endpoints are disabled in Azure mode.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## API endpoints
 
-## Suggestions for a good README
+```text
+GET  /api/health
+GET  /api/files
+POST /api/files
+GET  /api/file/info/{blobName}
+GET  /api/file/preview-html/{blobName}
+GET  /api/file/preview/{blobName}
+```
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+`/api/file/preview-html/{blobName}` returns JSON containing `type`, `content`, and `stats`. Statistics include original size, converted size, conversion time, cache status, and processed versus total pages, sheets, or slides.
 
-## Name
-Choose a self-explaining name for your project.
+For an existing PDF, the HTML endpoint returns a note pointing to `/api/file/preview/{blobName}`. Unsupported file types return HTTP 400 and missing files return HTTP 404.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## Project layout
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```text
+backend/Preview.Api/         ASP.NET Core API and Aspose services
+backend/Preview.Api/samples/ Local test files included with the POC
+src/                         React application and preview components
+scripts/                     Smoke tests and conversion comparison tools
+artifacts/                   Saved conversion evaluation report and JSON data
+```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+Important backend files:
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+- `Program.cs`: service registration and API routes
+- `FileSources.cs`: Azure Blob and local file stream implementations
+- `DocumentConverterService.cs`: Aspose HTML and PDF conversion
+- `HtmlPreviewService.cs`: HTML response, timing, and in-memory cache
+- `PreviewService.cs`: PDF conversion and streaming
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+## Tests and evaluation
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+With the backend running:
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+```powershell
+npm run smoke
+```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+With both the backend and Vite running:
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+```powershell
+npm run smoke:browser
+```
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+Build the React frontend:
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+```powershell
+npm run build
+```
 
-## License
-For open source projects, say how it is licensed.
+Measure the bundled Office samples, including the 20 MB and 40 MB workbooks:
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+```powershell
+npm run compare
+```
+
+The comparison writes `artifacts/conversion-report.md` and `artifacts/conversion-comparison.json`. Rebuild the Markdown report from saved measurements without running conversions again:
+
+```powershell
+npm run compare -- --format-only
+```
+
+## Repository notes
+
+The bundled samples and conversion evaluation files are intentionally included for this POC. Generated dependency/build folders and secrets are ignored, including `node_modules/`, `dist/`, `bin/`, `obj/`, environment files, and license files.
+
+This is a POC and does not yet include authorization, background conversion jobs, persistent caching, or production upload validation.
