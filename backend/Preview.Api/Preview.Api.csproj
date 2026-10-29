@@ -9,8 +9,7 @@
     <PackageReference Include="Aspose.Words" Version="26.10.0" />
     <PackageReference Include="Aspose.Cells" Version="26.8.0" />
     <PackageReference Include="Aspose.Slides.NET" Version="26.9.0" />
-    <PackageReference Include="MimeKit" Version="4.18.2" />
-    <PackageReference Include="MsgReader" Version="6.2.0" />
+    <PackageReference Include="Aspose.Email" Version="26.9.0" />
     <PackageReference Include="HtmlSanitizer" Version="9.2.1039" />
   </ItemGroup>
 </Project>

@@ -16,7 +16,7 @@ public static class PreviewTypes
             ".txt" => ("text", "text/plain; charset=utf-8"),
             ".md" => ("markdown", "text/plain; charset=utf-8"),
             ".xml" => ("xml", "text/plain; charset=utf-8"),
-            ".eml" or ".msg" => ("email", "application/octet-stream"),
+            ".eml" or ".msg" => ("email", "application/pdf"),
             _ => ("", "")
         };
         return kind.Length > 0;

@@ -15,6 +15,8 @@ builder.Services.AddSingleton<TextPreviewService>();
 
 var licensePath = builder.Configuration["Aspose:LicensePath"];
 if (!string.IsNullOrWhiteSpace(licensePath)) AsposeLicenses.Apply(licensePath);
+var emailLicensePath = builder.Configuration["Aspose:EmailLicensePath"];
+if (!string.IsNullOrWhiteSpace(emailLicensePath)) AsposeLicenses.ApplyEmail(emailLicensePath);
 
 var connectionString = builder.Configuration["AzureStorage:ConnectionString"];
 var containerName = builder.Configuration["AzureStorage:ContainerName"];
@@ -67,7 +69,7 @@ app.MapGet("/api/file/info/{**blobName}", async (string blobName, IFileSource so
         var file = await source.GetInfoAsync(blobName, cancellationToken);
         if (file is null) return Results.NotFound(new { error = "File not found" });
         if (!PreviewTypes.TryGet(file.Name, out var kind, out var contentType)) return Results.BadRequest(new { error = "Unsupported file type" });
-        return Results.Ok(new { file.Name, file.Length, kind, contentType });
+        return Results.Ok(new { file.Name, file.Length, kind, contentType, evaluationMode = kind == "email" && !AsposeLicenses.EmailLicensed });
     }
     catch (ArgumentException) { return Results.BadRequest(new { error = "Invalid file name" }); }
     catch (RequestFailedException ex) when (ex.Status == 404) { return Results.NotFound(new { error = "File not found" }); }
@@ -81,7 +83,7 @@ app.MapGet("/api/file/preview-html/{**blobName}", async (string blobName, IFileS
         if (file is null) return Results.NotFound(new { error = "File not found" });
         var extension = Path.GetExtension(file.Name).ToLowerInvariant();
         if (extension == ".pdf") return Results.Ok(HtmlPreviewService.PdfNote(file));
-        if (extension is not (".doc" or ".docx" or ".xls" or ".xlsx" or ".ppt" or ".pptx"))
+        if (extension is not (".doc" or ".docx" or ".xls" or ".xlsx" or ".ppt" or ".pptx" or ".eml" or ".msg"))
             return Results.BadRequest(new { error = "Unsupported file type for HTML preview" });
 
         var converted = await previews.GetAsync(file, source, http.RequestAborted);
@@ -94,6 +96,7 @@ app.MapGet("/api/file/preview-html/{**blobName}", async (string blobName, IFileS
         return Results.Ok(converted);
     }
     catch (ArgumentException) { return Results.BadRequest(new { error = "Invalid file name or document" }); }
+    catch (InvalidDataException ex) { return Results.BadRequest(new { error = ex.Message }); }
     catch (RequestFailedException ex) when (ex.Status == 404) { return Results.NotFound(new { error = "File not found" }); }
     catch (HtmlPreviewTooLargeException ex) { return Results.Json(new { error = ex.Message }, statusCode: 413); }
     catch (NotSupportedException) { return Results.BadRequest(new { error = "Unsupported file type for HTML preview" }); }
@@ -136,8 +139,8 @@ app.MapGet("/api/file/preview/{**blobName}", async (string blobName, IFileSource
         if (file is null) return Results.NotFound();
         if (!PreviewTypes.TryGet(file.Name, out var kind, out var contentType)) return Results.BadRequest(new { error = "Unsupported file type" });
 
-        http.Response.Headers.ContentDisposition = kind == "email" ? "attachment" : "inline";
-        if (kind != "office")
+        http.Response.Headers.ContentDisposition = "inline";
+        if (kind is not ("office" or "email"))
         {
             var stream = await source.OpenReadAsync(file, http.RequestAborted);
             return Results.File(stream, contentType, enableRangeProcessing: stream.CanSeek);
@@ -155,6 +158,7 @@ app.MapGet("/api/file/preview/{**blobName}", async (string blobName, IFileSource
         return Results.File(output, "application/pdf", enableRangeProcessing: true);
     }
     catch (ArgumentException) { return Results.BadRequest(new { error = "Invalid file name" }); }
+    catch (InvalidDataException ex) { return Results.BadRequest(new { error = ex.Message }); }
     catch (RequestFailedException ex) when (ex.Status == 404) { return Results.NotFound(); }
 });
 

@@ -1,0 +1,435 @@
+Delivered-To: hazsylvia8@gmail.com
+Received: by 2002:a05:6400:c084:10b0:2e6:99a5:c16d with SMTP id g4-n1csp2113548ecl;
+        Wed, 28 Oct 2026 15:23:11 -0700 (PDT)
+X-Received: by 2002:a17:90b:5383:b0:3a0:c31d:80c with SMTP id 98e67ed59e1d1-3ae6ece04a9mr445973a91.9.1793226191248;
+        Wed, 28 Oct 2026 15:23:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1793226191; cv=none;
+        d=google.com; s=arc-20260327;
+        b=ma3ue2neqD+WtqtcWZgYbIPmG5oQzjvcQ3Rzv4LCQAp76kYR87iRgB26I9ZfwrSpM+
+         1uhF7nY+hBdzFR/6v7ZO+LvKoAAidsWwYPYA2/6nlpiBJKyNVkBAay3Px3A3peA2g+V/
+         QS+MwACVUrbzOok33TZ7wbTGf9NfWGZ4uHmpgBsKdceUubYVMw9FQ/KPjJpmsg/gruRf
+         WMqxdmnKL8QOmWKG2vfzgRmyCH3wBvRF/O4Qyn2wcan6FRa18ZIk+tKSU5gXrt8cwLDr
+         Cm/72QVwFYqTjNJt25/aHmbEDu4L9HyXHIhifpFAYXbztKDJYRSDL3BoE2Ebg9xP1/33
+         RN0g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=to:reply-to:subject:message-id:mime-version:from:date
+         :content-transfer-encoding:dkim-signature:dkim-signature;
+        bh=Rbz8+Q+W37DCT+c2mKvELVXzUl9shxjcCe9k0eGiKrw=;
+        fh=82nhHFY64QFsYF4waXvbw5VhjuOviTnOupOQxbiOj0o=;
+        b=DiaxZrN/9/Rqv1bvCDR1aKr70kcIwT1/u6LejWpKrPjmGgPrMc4lypqZcP4yxUpsdB
+         Kg3erEVlmwpI7+lXOmGYKjAfkQtdx+NIesJf4MvDeLcuVndkyvVshmwBKRN3Wb3Koi/k
+         lsrXmgV98Rd/UA4D2bSqeu/XL8l0CMO5ei+ODNTHjs1CCfHBPb3BLmnrTomef/Ym6qlz
+         jtV3Wm9yj/IqrKWdylOiDZJj4MFv35R9CL/79idkPjpIwjdBpMgUnmY+jQ3yr0DXR370
+         oTBUK+H3ZlEBvIRKy76kPxt7gBqA1MDLPb86fX5xfXqwo4lAN2heAoXdK1VjHUB5YnHs
+         e8Ow==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@tm.openai.com header.s=s1 header.b=XR2HK95p;
+       dkim=pass header.i=@sendgrid.info header.s=smtpapi header.b=HNWiY0ag;
+       spf=pass (google.com: domain of bounces+20216706-c2c8-hazsylvia8=gmail.com@em7877.tm.openai.com designates 159.183.120.121 as permitted sender) smtp.mailfrom="bounces+20216706-c2c8-hazsylvia8=gmail.com@em7877.tm.openai.com";
+       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=tm.openai.com
+Return-Path: <bounces+20216706-c2c8-hazsylvia8=gmail.com@em7877.tm.openai.com>
+Received: from o14.ptr1360.openai.com (o14.ptr1360.openai.com. [159.183.120.121])
+        by mx.google.com with ESMTPS id 98e67ed59e1d1-3ae6e7e1de4si2106073a91.16.2026.10.28.15.23.10
+        for <hazsylvia8@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Oct 2026 15:23:11 -0700 (PDT)
+Received-SPF: pass (google.com: domain of bounces+20216706-c2c8-hazsylvia8=gmail.com@em7877.tm.openai.com designates 159.183.120.121 as permitted sender) client-ip=159.183.120.121;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@tm.openai.com header.s=s1 header.b=XR2HK95p;
+       dkim=pass header.i=@sendgrid.info header.s=smtpapi header.b=HNWiY0ag;
+       spf=pass (google.com: domain of bounces+20216706-c2c8-hazsylvia8=gmail.com@em7877.tm.openai.com designates 159.183.120.121 as permitted sender) smtp.mailfrom="bounces+20216706-c2c8-hazsylvia8=gmail.com@em7877.tm.openai.com";
+       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=tm.openai.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tm.openai.com;
+	h=content-transfer-encoding:content-type:date:from:mime-version:subject:
+	reply-to:to:cc:content-type:date:feedback-id:from:subject:to;
+	s=s1; t=1793226190;
+	bh=Rbz8+Q+W37DCT+c2mKvELVXzUl9shxjcCe9k0eGiKrw=;
+	b=XR2HK95p1VlEA7kKAnfNWEuLCAB1MSvXqrwG9HfXfglVeHD3xfai5gw3UVspN3A+hWTc
+	rLdRGUOh+WvkAu0T7t63vmISKdZ4IfIeIoekY210dPdytVS69ukdcxHC+VbjDbH1KR2RX9
+	owqkiVZtniCM9tVdDEfkQ5Czd+uKOjYpEA4wVK0KiByWO3/izxtBXoVvfoqSJE3+WmUETj
+	vl+CUqD0KWXRCJvuTyB7dMbnU7OO44yM+s8O5YUGjfo8eXu8MWdDdoo9U06k32IWWeXQrw
+	ZlDduLRRXsvxRM5ZcUgn3TRx3c8suR2j/XHy6c5o1qJXkwJKwW4onMo+3FtldXgw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sendgrid.info;
+	h=content-transfer-encoding:content-type:date:from:mime-version:subject:
+	reply-to:to:cc:content-type:date:feedback-id:from:subject:to;
+	s=smtpapi; t=1793226190;
+	bh=Rbz8+Q+W37DCT+c2mKvELVXzUl9shxjcCe9k0eGiKrw=;
+	b=HNWiY0ag96+KeXApjisAnx4DvGtfIGGoKoPPaChTTdMeiOFhlf7ZMdsTdACuIFsuuHPc
+	FzxA6UFhuV0VeViDBZ78VXEc57VPQxZyNSNqc1omF0q86XkvguxK8x0VtKFdImN7KvN9rA
+	JFntI3fza5zYGqRRClHx0ofwgjsdzuN0U=
+Received: by recvd-7497f4c48b-pmcv2 with SMTP id recvd-7497f4c48b-pmcv2-1-6AE275CE-AE
+	2026-10-28 22:23:10.430574256 +0000 UTC m=+2524925.335785507
+Received: from MjAyMTY3MDY (unknown)
+	by geopod-ismtpd-87 (SG) with HTTP
+	id 42z_TYSKT9qzm10vJF5qEw
+	Wed, 28 Oct 2026 22:23:10.396 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=us-ascii
+Date: Wed, 28 Oct 2026 22:23:10 +0000 (UTC)
+From: OpenAI <noreply@tm.openai.com>
+Mime-Version: 1.0
+Message-ID: <42z_TYSKT9qzm10vJF5qEw@geopod-ismtpd-87>
+Subject: [Action required] Migrate your legacy user API keys
+Reply-To: noreply@tm.openai.com
+X-SG-EID: 
+ =?us-ascii?Q?u001=2EpDXn7XyDvIUG5VuGYC+VAIfgfX9p=2FPJ3k8Jf5bQDbJRHqG9Z2eZPlPn4a?=
+ =?us-ascii?Q?Y8Btia0d2MaDOeLesAK7SWsR3PIjTcNy7NgQVqr?=
+ =?us-ascii?Q?DBgia0DcBVqodRjNzI1hlJd54UHfuTqP1mmtETY?=
+ =?us-ascii?Q?i6jI+9DsKMD796YYxb98eI8wpiLNxGnl7lQ=2FZJK?=
+ =?us-ascii?Q?K0xeIuK6kInWvrx78dVmGAK5um2bsBANwRXo=2F+7?=
+ =?us-ascii?Q?YhhM+qdCOMdBqgXakfI+60=3D?=
+X-SG-ID: 
+ =?us-ascii?Q?u001=2ESdBcvi+Evd=2FbQef8eZF3BoMNuFmcP5rq+Py=2FzrrMdK6QuthCfWhsA2OXF?=
+ =?us-ascii?Q?d2ogPal5ecNFS2d9sR6gemXdd8Z7haYPWzNeVm8?=
+ =?us-ascii?Q?pN2N9SN6k4Gs5IDxQ6USkE5qqhcldb+TghE9tiq?=
+ =?us-ascii?Q?I01yTmJyFjHrOy8bQBYD3qVbj1mKDUbU89G6VsV?=
+ =?us-ascii?Q?DZ0WiTRKph0bPL5=2FDNsrtAUp2vOt5GtHLNju4ph?=
+ =?us-ascii?Q?hhR7+C9Ugma=2FM3w7wXZ0kQ=3D?=
+To: hazsylvia8@gmail.com
+X-Entity-ID: u001.bVuJR+6WQkYgHBZFem2ybw==
+
+<!DOCTYPE html>
+<html>
+<head>
+ =20
+  <meta charset=3D"utf-8">
+  <meta http-equiv=3D"x-ua-compatible" content=3D"ie=3Dedge">
+  <title>[Action required] Migrate your legacy user API keys</title>
+  <meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale=3D=
+1">
+  <style type=3D"text/css">
+  /**
+   * Google webfonts. Recommended to include the .woff version for cross-cl=
+ient compatibility.
+   */
+  @media screen {
+    @font-face {
+      font-family: Colfax;
+      src: url(https://openai-public.s3-us-west-2.amazonaws.com/beta/fonts/=
+ColfaxAIRegular.woff2);
+      font-weight: normal;
+    }
+
+    @font-face {
+      font-family: Colfax;
+      src: url(https://openai-public.s3-us-west-2.amazonaws.com/beta/fonts/=
+ColfaxAIMedium.woff2);
+      font-weight: bold;
+    }
+  }
+
+  /**
+   * Avoid browser level font resizing.
+   * 1. Windows Mobile
+   * 2. iOS / OSX
+   */
+  body,
+  table,
+  td,
+  a {
+    -ms-text-size-adjust: 100%; /* 1 */
+    -webkit-text-size-adjust: 100%; /* 2 */
+    font-family: Colfax, Helvetica, Arial, sans-serif;
+  }
+
+  /**
+   * Remove extra space added to tables and cells in Outlook.
+   */
+  table,
+  td {
+    mso-table-rspace: 0pt;
+    mso-table-lspace: 0pt;
+  }
+
+  /**
+   * Better fluid images in Internet Explorer.
+   */
+  img {
+    -ms-interpolation-mode: bicubic;
+  }
+
+  /**
+   * Remove blue links for iOS devices.
+   */
+  a[x-apple-data-detectors] {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    line-height: inherit !important;
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  /**
+   * Fix centering issues in Android 4.4.
+   */
+  div[style*=3D"margin: 16px 0;"] {
+    margin: 0 !important;
+  }
+
+  body {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /**
+   * Collapse table borders to avoid space between cells.
+   */
+  table {
+    border-collapse: collapse !important;
+  }
+
+  a {
+    color: #10A37F;
+  }
+
+  img {
+    height: auto;
+    line-height: 100%;
+    text-decoration: none;
+    border: 0;
+    outline: none;
+  }
+
+  h1 {
+      font-size: 26px;
+      line-height: 1.4;
+      font-weight: 700;
+      margin: 0;
+  }
+  h2 {
+      font-size: 24px;
+      line-height: 1.4;
+      font-weight: 700;
+      margin: 0;
+  }
+  p {
+      margin: 0;
+  }
+  p + p {
+      margin-top: 16px;
+  }
+
+  @media only screen and (max-width: 480px) {
+    .prospect-generated-preview-wrapper {
+      padding: 0 12px 16px !important;
+    }
+
+    .prospect-generated-preview-media {
+      width: 96px !important;
+      min-width: 96px !important;
+      max-width: 96px !important;
+    }
+
+    .prospect-generated-preview-image {
+      width: 96px !important;
+      min-width: 96px !important;
+      max-width: 96px !important;
+      height: 96px !important;
+    }
+
+    .prospect-generated-preview-content {
+      padding: 12px !important;
+    }
+  }
+  </style>
+
+ =20
+</head>
+<body style=3D"background-color: #ffffff;">
+
+  <div class=3D"preheader" style=3D"display: none; max-width: 0; max-height=
+: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opaci=
+ty: 0;">
+      Inactive legacy user API key deactivations begin October 29, 2026
+  </div>
+
+  <!-- start body -->
+  <table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%">
+    <!-- start body block -->
+    <tr>
+      <td align=3D"center">
+        <!--[if (gte mso 9)|(IE)]>
+        <table align=3D"center" border=3D"0" cellpadding=3D"0" cellspacing=
+=3D"0" width=3D"560">
+        <tr>
+        <td align=3D"center" valign=3D"top" width=3D"560">
+        <![endif]-->
+        <table align=3D"center" border=3D"0" cellpadding=3D"0" cellspacing=
+=3D"0" width=3D"100%" style=3D"width: 100%; max-width: 560px; background-co=
+lor: #fff;">
+           =20
+              <!-- header image -->
+              <tr>
+                  <td valign=3D"top" style=3D"padding: 27px 20px 24px 15px;=
+">
+                      <table align=3D"left" width=3D"100%" border=3D"0" cel=
+lpadding=3D"0" cellspacing=3D"0" style=3D"min-width:100%;">
+                          <tbody><tr>
+                              <td valign=3D"top" style=3D"padding-top: 0; p=
+adding-bottom: 0; text-align:left;">
+                                 =20
+                                  <img align=3D"left" alt=3D"" src=3D"https=
+://cdn.openai.com/API/logo-assets/openai-logo-email-header-1.png" width=3D"=
+140" height=3D"42" style=3D"width:140px; max-width:100%; padding-bottom: 0;=
+ display: inline !important; vertical-align: bottom;">
+                                 =20
+                              </td>
+                          </tr>
+                          </tbody></table>
+                  </td>
+              </tr>
+           =20
+
+         =20
+<tr>
+  <td align=3D"left" bgcolor=3D"#ffffff" style=3D"padding: 16px 24px; font-=
+size: 16px; line-height: 24px;">
+    <p>
+      Your organization has one or more legacy user API keys. To help prote=
+ct your
+      organization from credential leaks and unauthorized access, we will b=
+egin deactivating legacy
+      user API keys that have not been used for at least 14 days
+      <strong>starting on October 29, 2026</strong>. Deactivations will tak=
+e place on a rolling basis.
+    </p>
+   =20
+      <p>Organization: Personal (org-UbqSwnZWr7MvTrDY2KFZhWd8)</p>
+   =20
+   =20
+     =20
+        <p>Below you can find all legacy keys associated with your organiza=
+tion.</p>
+     =20
+      <p>Legacy user API keys:</p>
+      <ul>
+       =20
+          <li><code>key_U0sIcIw6Au7aXwvi</code></li>
+       =20
+      </ul>
+   =20
+    <p>We will check usage again before deactivation and send a final notic=
+e listing the keys scheduled for deactivation.</p>
+    <p>You can view all legacy User API Keys and revoke them in:</p>
+    <ul>
+      <li>
+        <a href=3D"http://url3243.email.openai.com/ls/click?upn=3Du001.IQLf=
+sj4kk-2BK7JhymNusRMkuuWNTB2xtKMTOzsaHXXCz2xmukoIOssMRko7CI7QTyF26pGvuvIpCh9=
+QoABhUnkyHW9mKd5j6u9igSg3pPYoQWv1wu4W6L3t2kf2vJ-2Bdfp1-2Bz7nwUTiTwrjC37szj8=
+oBJZAVoB3F-2Fx2qhMSdluECM-3DjdVM_TZECUkYz-2BzQfR72rHnhgg9zdaNmcfVRBk-2F01J6=
+ycwML0LHEwhdzdqygxbRciKqxloqZY-2FQvOUi2WKknMhCWy-2BpMw8FkFQUVdulAi6hJLNx7XS=
+4cLKLSs4d7U2Q4wfXypnjUw7xaR696o0Qxz78TfZEBEEBY-2FRgAdO-2FbmPigAOMIp6vVPvGII=
+3BZZXNc-2Bepq6-2FxoGB1wTbvOaD7cZd7IU74JJekOFQxmb8F8qQqa99cVwYz40dEGM-2F7EiI=
+yGON9fUcRxr6x293JvBK2KttYBdnrmRAOfl17BI8oLflcYa4sTx6tQei1pbhnWcXFmL4F5PC-2B=
+XBIJ8D6vV0HkZyyWryq4b2qu-2F7HdTgeG-2FZ4-2FP5uvB0UwAAE6O4IEP820OpBx-2BnT7XZF=
+QyNRBYlBPQbmUAu4knQJCYR0XknKLxEzuPWCG8-3D" target=3D"_blank">Organization A=
+PI Keys Page &rarr; User API Keys</a>
+      </li>
+      <li><a href=3D"http://url3243.email.openai.com/ls/click?upn=3Du001.IQ=
+Lfsj4kk-2BK7JhymNusRMkuuWNTB2xtKMTOzsaHXXCxVx-2BSQGNT3-2BTyAsYtl9FkIF17UmzC=
+6hGzzRH8rWEr-2B-2Bg-3D-3D3J9N_TZECUkYz-2BzQfR72rHnhgg9zdaNmcfVRBk-2F01J6ycw=
+ML0LHEwhdzdqygxbRciKqxloqZY-2FQvOUi2WKknMhCWy-2BpMw8FkFQUVdulAi6hJLNx7XS4cL=
+KLSs4d7U2Q4wfXypnjUw7xaR696o0Qxz78TfZEBEEBY-2FRgAdO-2FbmPigAOMIp6vVPvGII3BZ=
+ZXNc-2Bepq6-2FxoGB1wTbvOaD7cZd7IU74JJekOFQxmb8F8qQqa99cWWCoGWzXMXRky5aA7mrn=
+zsB78ahnVO0Dbrv-2F8NKKFVw7LZ-2Fnp8W9-2BuW1QrDFHR8vVqW9pwG852S8dM3i-2F7GJ3z9=
+eI2QgfUEVHKOT7YkXA3gtl8Y6HbkiGSzm0Xno0T1kvbdatpKbO-2B04ENEbaIkpUWd1SWtxNOvV=
+QooFbCdaBorWSnok0RYZPYrbDTxuIXPv4-3D" target=3D"_blank">Profile &rarr; User=
+ API Keys</a></li>
+    </ul>
+    <p>
+      Please move any workloads that rely on these keys to new project API =
+keys created on
+      <a href=3D"http://url3243.email.openai.com/ls/click?upn=3Du001.IQLfsj=
+4kk-2BK7JhymNusRMkuuWNTB2xtKMTOzsaHXXCzUHkSUd5Z3t4-2BtbIUmHnz6nQdwYL1cy03IU=
+vjy-2FxfpmGjYtDjQ7yhwED3vZV4O7uq-2FPYUtq03BTAoQZslzN3f10cym_TZECUkYz-2BzQfR=
+72rHnhgg9zdaNmcfVRBk-2F01J6ycwML0LHEwhdzdqygxbRciKqxloqZY-2FQvOUi2WKknMhCWy=
+-2BpMw8FkFQUVdulAi6hJLNx7XS4cLKLSs4d7U2Q4wfXypnjUw7xaR696o0Qxz78TfZEBEEBY-2=
+FRgAdO-2FbmPigAOMIp6vVPvGII3BZZXNc-2Bepq6-2FxoGB1wTbvOaD7cZd7IU74JJekOFQxmb=
+8F8qQqa99cXiMC8JyoKWypQPtFB1bV5ls-2BPj2yvmbT2WENX7rDTBSpn5y-2Fw4R0SHyfB9MFz=
+aHXNkLZfWjiwzLRanzS5WvaJfKzp9Nhmwx66w0y5EJtY34Cx33-2BHtudUHgVhES6RJUeFfS0n6=
+TTuPvXwhCQSJ1ZNO3eQU7xOiyhaHRfmAmrtpWdbhm8yuGI8VRV-2FZlGoBcJk-3D" target=3D=
+"_blank">https://platform.openai.com/api-keys</a>
+      before deactivation to avoid interruption.
+    </p>
+    <p>Please do not send API keys by email.</p>
+    <p>
+      Thank you,<br/>
+      OpenAI Team
+    </p>
+  </td>
+</tr>
+
+
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
+        </td>
+        </tr>
+        </table>
+        <![endif]-->
+      </td>
+    </tr>
+    <!-- end body block -->
+
+    <!-- start footer -->
+    <tr>
+      <td align=3D"center" style=3D"padding: 24px;">
+        <!--[if (gte mso 9)|(IE)]>
+        <table align=3D"center" border=3D"0" cellpadding=3D"0" cellspacing=
+=3D"0" width=3D"600">
+        <tr>
+        <td align=3D"center" valign=3D"top" width=3D"600">
+        <![endif]-->
+        <table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"10=
+0%" style=3D"max-width: 560px;">
+           =20
+  <tr>
+  <td align=3D"left" style=3D"padding: 4px 24px; font-size: 14px; line-heig=
+ht: 20px; color: #666;">
+    <p style=3D"margin: 0;">If you have any questions please contact us thr=
+ough our <a href=3D"http://url3243.email.openai.com/ls/click?upn=3Du001.IQL=
+fsj4kk-2BK7JhymNusRMmfwoG2v3nTgHW39-2Fobue0vS8iPJK05Qsdjl1qKLmoz-2F28YB_TZE=
+CUkYz-2BzQfR72rHnhgg9zdaNmcfVRBk-2F01J6ycwML0LHEwhdzdqygxbRciKqxloqZY-2FQvO=
+Ui2WKknMhCWy-2BpMw8FkFQUVdulAi6hJLNx7XS4cLKLSs4d7U2Q4wfXypnjUw7xaR696o0Qxz7=
+8TfZEBEEBY-2FRgAdO-2FbmPigAOMIp6vVPvGII3BZZXNc-2Bepq6-2FxoGB1wTbvOaD7cZd7IU=
+74JJekOFQxmb8F8qQqa99cW639q-2B6TNEgK-2FyUS71V-2BRfWKTXKf7RQyyh4t-2F35ZcpcUt=
+mnkQq-2BltFCD8cca6oXeCF4NpFGcdbhgbO7lwX7zJcC9fJwNnTynljVyHm9I43MUcG0pBcoodP=
+S8JkrM6Pjd40SFM1rjXdFkh2MQWshAdQ-2B4ehREQWJh-2BW-2BuzMW3wmr2I4dsoFfI5voDNJ5=
+ULXqhE-3D">help center</a></p>
+  </td>
+</tr>
+
+        </table>
+        <!--[if (gte mso 9)|(IE)]>
+        </td>
+        </tr>
+        </table>
+        <![endif]-->
+      </td>
+    </tr>
+    <!-- end footer -->
+
+  </table>
+  <!-- end body -->
+  <div class=3D"debug-string" style=3D"display: none; max-width: 0; max-hei=
+ght: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #ececf1;=
+ opacity: 0;">
+     =20
+  </div>
+
+<img src=3D"http://url3243.email.openai.com/wf/open?upn=3Du001.DJoyJvmaJzLt=
+zvEpBcIBlgyZ3eRSKv4PeQ6iBS3NsICy-2BJShuwRqeYOXBgt9jMlMFL6DYAD5PoYj1kKOwqy1R=
+Op3eIGJ-2F-2Bonu8h5qOu0M5W9czEjr1u6cYIU6wctUeDwyWrduuPF3SX7GeZQKyMxR-2B66zy=
+6FstT51dx3D7s3gX18508VMg5V6MItJJUsujJrM9KEkjjwt8-2B6fyw1rANiGRD-2FRCmxe0f-2=
+F8Sltr3FunrzveRCZ2oqHssEFW73pKB-2Bo3lz5F7GwA0zu7T9c6wifMoaIjmLj27NO2Bi9uzd5=
+VT9anKzqv8xRYKkZ22aDQQ44q599KZl4D6NJgLoJG5tnMkLfMcsLvtLm7y4PuhXoJjVFnApTNOn=
+4azktjQhio17Oz87XxCHFKeARPcrOiGJyoR9c87G-2Fi4S1-2BFOBziYvZtg-3D" alt=3D"" w=
+idth=3D"1" height=3D"1" border=3D"0" style=3D"height:1px !important;width:1=
+px !important;border-width:0 !important;margin-top:0 !important;margin-bott=
+om:0 !important;margin-right:0 !important;margin-left:0 !important;padding-=
+top:0 !important;padding-bottom:0 !important;padding-right:0 !important;pad=
+ding-left:0 !important;"/></body>
+</html>

@@ -26,11 +26,11 @@ export default function HtmlPreview({ blobName, attempt }) {
     return () => controller.abort();
   }, [blobName, attempt]);
 
-  const unit = /\.xls(x)?$/i.test(blobName) ? 'sheets' : /\.ppt(x)?$/i.test(blobName) ? 'slides' : 'pages';
+  const unit = /\.xls(x)?$/i.test(blobName) ? 'sheets' : /\.ppt(x)?$/i.test(blobName) ? 'slides' : /\.(eml|msg)$/i.test(blobName) ? 'messages' : 'pages';
   const { stats } = result;
 
   return <div className="html-preview">
-    {result.status === 'loading' && <p className="viewer-message" role="status">Converting the full document…</p>}
+    {result.status === 'loading' && <p className="viewer-message" role="status">Converting the full file…</p>}
     {result.status === 'error' && <div className="preview-error" role="alert">{result.error}</div>}
     {stats && <div className="html-stats" aria-label="HTML preview performance stats">
       <span>Original <strong>{formatSize(stats.originalFileSizeBytes)}</strong><small>{stats.originalFileSizeBytes.toLocaleString()} bytes</small></span>

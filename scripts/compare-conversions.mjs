@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 const api = process.env.PREVIEW_API_URL || 'http://localhost:5050';
 const args = process.argv.slice(2);
 const formatOnly = args[0] === '--format-only';
+const emailsOnly = args[0] === '--emails';
 const defaultNames = [
   'sample-word.docx',
   'React Boilerplate Walkthrough & Agent Overview.docx',
@@ -13,9 +14,13 @@ const defaultNames = [
   'sample-slides.pptx',
   'AI-Hackathon-Proposal-Template-EPAM.pptx',
   '40mb.xlsx',
+  'sample-email.eml',
+  'sample-outlook.msg',
 ];
-const names = formatOnly ? [] : args.length ? args : defaultNames;
-const saved = formatOnly
+const names = formatOnly ? [] : emailsOnly
+  ? (await (await fetch(`${api}/api/files`)).json()).filter((name) => /\.(eml|msg)$/i.test(name))
+  : args.length ? args : defaultNames;
+const saved = (formatOnly || args.length)
   ? JSON.parse(await readFile('artifacts/conversion-comparison.json', 'utf8'))
   : null;
 
@@ -29,7 +34,7 @@ async function fileInfo(name) {
   const response = await fetch(`${api}/api/file/info/${encodeURIComponent(name)}`);
   if (!response.ok) throw new Error(`${name}: file info returned HTTP ${response.status}`);
   const info = await response.json();
-  if (info.kind !== 'office') throw new Error(`${name}: expected an Office file`);
+  if (!['office', 'email'].includes(info.kind)) throw new Error(`${name}: expected an Office or email file`);
   return info;
 }
 
@@ -53,8 +58,8 @@ async function measureHtml(name) {
   }
 }
 
-async function measurePdf(name, originalSizeBytes) {
-  if (originalSizeBytes >= 30 * 1024 * 1024)
+async function measurePdf(name, originalSizeBytes, kind) {
+  if (kind === 'office' && originalSizeBytes >= 30 * 1024 * 1024)
     return { skipped: true, error: 'Full PDF conversion skipped after the 40 MB trial failed above 7 GB of API working memory.', requestTimeMs: null };
   const rangeOnly = originalSizeBytes >= 10 * 1024 * 1024;
   const started = performance.now();
@@ -94,8 +99,11 @@ if (!formatOnly) {
     const html = await measureHtml(name);
     if (!html.error && html.processed !== html.total)
       throw new Error(`${name}: HTML conversion processed ${html.processed} of ${html.total}; full-file export is required`);
-    const pdf = await measurePdf(name, info.length);
-    results.push({ name, type: name.split('.').at(-1).toUpperCase(), originalSizeBytes: info.length, html, pdf });
+    const pdf = await measurePdf(name, info.length, info.kind);
+    const entry = { name, type: name.split('.').at(-1).toUpperCase(), originalSizeBytes: info.length, evaluationMode: info.evaluationMode, html, pdf };
+    const previous = results.findIndex((item) => item.name === name);
+    if (previous >= 0) results[previous] = entry;
+    else results.push(entry);
     console.log(`  HTML: ${html.error ? `error: ${html.error}` : `${html.sizeBytes.toLocaleString('en-US')} bytes`}; PDF: ${pdf.error ? `error: ${pdf.error}` : `${pdf.sizeBytes.toLocaleString('en-US')} bytes`}`);
   }
 }
@@ -105,23 +113,23 @@ const formatBytes = (bytes) => bytes >= 1024 * 1024
   : bytes >= 1024 ? `${(bytes / 1024).toFixed(1)} KiB` : `${bytes} B`;
 const exactSize = (bytes) => `${bytes.toLocaleString('en-US')} bytes (${formatBytes(bytes)})`;
 const safe = (value) => String(value).replaceAll('|', '\\|').replaceAll('\n', ' ');
-function metricRow(format, metric) {
+function metricRow(format, metric, evaluationMode = false) {
   if (metric.error) {
     const generatedSizeBytes = metric.generatedSizeBytes ?? (format === 'HTML' ? overflowBytes(metric.error) : null);
     const output = generatedSizeBytes === null ? '—' : `${exactSize(generatedSizeBytes)} (not served)`;
     const result = metric.skipped ? 'Not measured' : metric.httpStatus === 413 ? 'HTTP 413: response too large' : `Error${metric.httpStatus ? ` ${metric.httpStatus}` : ''}: ${metric.error}`;
     return `| ${format} | ${output} | — | ${metric.requestTimeMs === null ? '—' : `${metric.requestTimeMs.toLocaleString('en-US')} ms`} | ${safe(result)} |`;
   }
-  return `| ${format} | ${exactSize(metric.sizeBytes)} | ${metric.conversionTimeMs.toLocaleString('en-US')} ms | ${metric.requestTimeMs.toLocaleString('en-US')} ms | Complete |`;
+  return `| ${format} | ${exactSize(metric.sizeBytes)} | ${metric.conversionTimeMs.toLocaleString('en-US')} ms | ${metric.requestTimeMs.toLocaleString('en-US')} ms | ${evaluationMode ? 'Aspose.Email evaluation mode' : 'Complete'} |`;
 }
 
-const generatedAt = saved?.generatedAt ?? new Date().toISOString();
+const generatedAt = formatOnly ? saved.generatedAt : new Date().toISOString();
 const lines = [
-  '# Office conversion comparison',
+  '# File conversion comparison',
   '',
   `Measured: ${generatedAt}`,
   '',
-  'HTML and PDF conversions export the complete source document. The values are a snapshot of the endpoints at measurement time.',
+  'HTML and PDF conversions cover the complete source document or email body. Email attachment names are included; attachment contents are not rendered. The values are a snapshot of the endpoints at measurement time.',
   '',
 ];
 const largeExcel = results.filter((item) => (item.type === 'XLS' || item.type === 'XLSX') && item.originalSizeBytes >= 10 * 1024 * 1024);
@@ -144,7 +152,7 @@ if (largeExcel.length) {
 }
 for (const type of [...new Set(results.map((item) => item.type))]) {
   lines.push(`## ${type}`, '');
-  for (const { name, originalSizeBytes, html, pdf } of results.filter((item) => item.type === type)) {
+  for (const { name, originalSizeBytes, evaluationMode, html, pdf } of results.filter((item) => item.type === type)) {
     lines.push(
       `### ${safe(name)}`,
       '',
@@ -152,8 +160,8 @@ for (const type of [...new Set(results.map((item) => item.type))]) {
       '',
       '| Format | Output | Conversion | Request | Result |',
       '| --- | ---: | ---: | ---: | --- |',
-      metricRow('HTML', html),
-      metricRow('PDF', pdf),
+      metricRow('HTML', html, evaluationMode),
+      metricRow('PDF', pdf, evaluationMode),
       '',
     );
   }

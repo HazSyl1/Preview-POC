@@ -1,6 +1,6 @@
 # File Preview POC
 
-React + ASP.NET Core proof of concept for previewing files stored in Azure Blob Storage. Office documents can be rendered as complete HTML or PDF previews using Aspose.
+React + ASP.NET Core proof of concept for previewing files stored in Azure Blob Storage. Office documents and email messages can be rendered as HTML or PDF previews using Aspose.
 
 Supported formats:
 
@@ -18,14 +18,14 @@ Office files are loaded as streams by the ASP.NET backend and converted with the
 
 The HTML conversion exports the complete document: all Word pages, Excel worksheets, and PowerPoint slides. Large HTML responses are held in memory because the POC returns HTML inside JSON; outputs over 100 MiB return HTTP 413.
 
-Email previews show the sender, recipients, subject, date, body, and attachment names. EML uses MimeKit; Outlook MSG uses MSGReader. HTML email is sanitized and displayed in a sandboxed iframe. Remote images are blocked; inline PNG/JPEG/GIF/WebP images referenced by content ID are embedded. Attachments are listed but not opened. Markdown is rendered with raw HTML disabled and remote images blocked. TXT and XML display as text; XML is indented when valid, or shown unchanged with a warning when parsing fails. These previews show the full accepted file content without an extra preview cutoff.
+EML and MSG are loaded with Aspose.Email. Its HTML export embeds inline images; the server sanitizes the result and React displays it in a sandboxed iframe. For PDF, Aspose.Email creates MHTML in memory and Aspose.Words renders that stream as PDF. Email headers and attachment names are included; attachment contents are not rendered. Both modes report original/output size and conversion time through the same preview endpoints as Office files. Markdown is rendered with raw HTML disabled and remote images blocked. TXT and XML display as text; XML is indented when valid, or shown unchanged with a warning when parsing fails. These previews show the full accepted file content without an extra preview cutoff.
 
 ## Prerequisites
 
 - .NET SDK 9
 - Node.js 22.13 or newer
 - A current browser
-- An Aspose license for production-quality output
+- Aspose.Words, Aspose.Cells, Aspose.Slides, and Aspose.Email licenses for unrestricted output
 
 ## Run with local samples
 
@@ -59,6 +59,8 @@ dotnet run --urls http://localhost:5050
 
 Do not commit the license file.
 
+If Aspose.Email has a separate license file, also set `$env:Aspose__EmailLicensePath="C:\path\to\Aspose.Email.lic"`. Without an Aspose.Email license, email conversion runs in evaluation mode and may alter the subject or limit attachments. The UI and comparison report identify evaluation results.
+
 ## Azure Blob Storage
 
 Set both values before starting the backend:
@@ -85,11 +87,11 @@ GET  /api/file/preview-text/{blobName}
 GET  /api/file/preview/{blobName}
 ```
 
-`/api/file/preview-html/{blobName}` returns JSON containing `type`, `content`, and `stats`. Statistics include original size, converted size, conversion time, cache status, and processed versus total pages, sheets, or slides.
+`/api/file/preview-html/{blobName}` returns JSON containing `type`, `content`, and `stats`. Statistics include original size, converted size, conversion time, cache status, and processed versus total pages, sheets, slides, or email messages.
 
 For an existing PDF, the HTML endpoint returns a note pointing to `/api/file/preview/{blobName}`. Unsupported file types return HTTP 400 and missing files return HTTP 404.
 
-`/api/file/preview-email/{blobName}` returns email metadata, sanitized `bodyHtml`, `bodyText`, `attachmentNames`, and `originalFileSizeBytes`. `/api/file/preview-text/{blobName}` returns `type`, full `content`, `originalFileSizeBytes`, and an optional `parseWarning`. The original EML/MSG can be downloaded through `/api/file/preview/{blobName}`.
+`/api/file/preview-email/{blobName}` returns Aspose.Email metadata, sanitized `bodyHtml`, `bodyText`, `attachmentNames`, and `originalFileSizeBytes`. `/api/file/preview-html/{blobName}` converts Office and email files to HTML with conversion stats. `/api/file/preview/{blobName}` converts Office and email files to PDF with size and timing headers. `/api/file/preview-text/{blobName}` returns `type`, full `content`, `originalFileSizeBytes`, and an optional `parseWarning`.
 
 ## Project layout
 
@@ -108,6 +110,7 @@ Important backend files:
 - `DocumentConverterService.cs`: Aspose HTML and PDF conversion
 - `HtmlPreviewService.cs`: HTML response, timing, and in-memory cache
 - `PreviewService.cs`: PDF conversion and streaming
+- `EmailPreviewService.cs`: Aspose.Email loading and HTML/MHTML conversion
 
 ## Tests and evaluation
 
@@ -129,7 +132,7 @@ Build the React frontend:
 npm run build
 ```
 
-Measure the bundled Office samples, including the 20 MB and 40 MB workbooks:
+Measure the bundled Office and email samples, including the 20 MB and 40 MB workbooks:
 
 ```powershell
 npm run compare
@@ -139,6 +142,12 @@ The comparison writes `artifacts/conversion-report.md` and `artifacts/conversion
 
 ```powershell
 npm run compare -- --format-only
+```
+
+To measure all email files currently in the local samples folder and update their rows while retaining earlier Office results:
+
+```powershell
+npm run compare -- --emails
 ```
 
 ## Repository notes

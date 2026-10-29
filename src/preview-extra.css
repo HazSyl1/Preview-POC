@@ -1,4 +1,4 @@
-.text-preview,.email-preview{flex:1;min-width:0;background:#fff;overflow:auto}
+.text-preview{flex:1;min-width:0;background:#fff;overflow:auto}
 .text-preview{padding:20px 24px}
 .source-text{white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.6 Consolas,monospace;margin:0;color:#243329}
 .markdown-body{font-size:14px;line-height:1.65;overflow-wrap:anywhere}
@@ -8,11 +8,3 @@
 .markdown-body th,.markdown-body td{padding:6px 10px;border:1px solid #dce5da}
 .markdown-body a{color:#2c6844}
 .blocked-image{color:#7b897e;font-style:italic}
-.email-headers,.email-attachments{padding:20px 24px;border-bottom:1px solid #e5ebe3}
-.email-headers h3{margin:0 0 14px;font-size:18px}
-.email-headers dl{display:grid;grid-template-columns:50px minmax(0,1fr);gap:6px 12px;margin:0;font-size:12px;overflow-wrap:anywhere}
-.email-headers dt{color:#819087}.email-headers dd{margin:0}
-.email-frame{display:block;width:100%;min-height:460px;border:0;background:#fff}
-.email-text{padding:20px 24px;min-height:300px}
-.email-attachments{border-top:1px solid #e5ebe3;border-bottom:0;font-size:12px}
-.email-attachments ul{margin:10px 0 0;padding-left:20px;overflow-wrap:anywhere}

@@ -7,7 +7,7 @@ namespace Preview.Api;
 public sealed class HtmlPreviewTooLargeException(long bytes)
     : Exception($"The full HTML export is {bytes:N0} bytes, too large for this JSON preview. Use the PDF view for this file.");
 
-public sealed class DocumentConverterService
+public sealed class DocumentConverterService(EmailPreviewService email)
 {
     public HtmlConversion ConvertToHtmlPreview(Stream input, string extension, CancellationToken cancellationToken)
     {
@@ -18,6 +18,7 @@ public sealed class DocumentConverterService
             ".doc" or ".docx" => ConvertWordToHtml(input, output),
             ".xls" or ".xlsx" => ConvertExcelToHtml(input, output),
             ".ppt" or ".pptx" => ConvertSlidesToHtml(input, output),
+            ".eml" or ".msg" => email.ConvertToHtml(input, output, extension),
             _ => throw new NotSupportedException($"Unsupported extension: {extension}")
         };
         cancellationToken.ThrowIfCancellationRequested();
@@ -107,6 +108,10 @@ public sealed class DocumentConverterService
             case ".ppt":
             case ".pptx":
                 ConvertSlidesPreview(input, output);
+                break;
+            case ".eml":
+            case ".msg":
+                email.ConvertToPdf(input, output, extension);
                 break;
             default:
                 throw new NotSupportedException($"Unsupported extension: {extension}");

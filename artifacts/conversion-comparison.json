@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-28T10:15:46.668Z",
+  "generatedAt": "2026-10-29T10:28:17.141Z",
   "results": [
     {
       "name": "sample-word.docx",
@@ -167,6 +167,177 @@
         "skipped": true,
         "error": "Full PDF conversion skipped after the 40 MB trial failed above 7 GB of API working memory.",
         "requestTimeMs": null
+      }
+    },
+    {
+      "name": "sample-email.eml",
+      "type": "EML",
+      "originalSizeBytes": 1240,
+      "evaluationMode": true,
+      "html": {
+        "sizeBytes": 1446,
+        "conversionTimeMs": 34,
+        "requestTimeMs": 37,
+        "processed": 1,
+        "total": 1
+      },
+      "pdf": {
+        "sizeBytes": 100477,
+        "conversionTimeMs": 159,
+        "requestTimeMs": 166,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "sample-outlook.msg",
+      "type": "MSG",
+      "originalSizeBytes": 209408,
+      "evaluationMode": true,
+      "html": {
+        "sizeBytes": 2230,
+        "conversionTimeMs": 51,
+        "requestTimeMs": 54,
+        "processed": 1,
+        "total": 1
+      },
+      "pdf": {
+        "sizeBytes": 126458,
+        "conversionTimeMs": 268,
+        "requestTimeMs": 274,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "Did you fill_.msg",
+      "type": "MSG",
+      "originalSizeBytes": 242688,
+      "evaluationMode": true,
+      "html": {
+        "sizeBytes": 152702,
+        "conversionTimeMs": 1422,
+        "requestTimeMs": 1492,
+        "processed": 1,
+        "total": 1
+      },
+      "pdf": {
+        "sizeBytes": 180414,
+        "conversionTimeMs": 3022,
+        "requestTimeMs": 3046,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "EPAM Daily Digest.msg",
+      "type": "MSG",
+      "originalSizeBytes": 317440,
+      "evaluationMode": true,
+      "html": {
+        "sizeBytes": 30181,
+        "conversionTimeMs": 247,
+        "requestTimeMs": 252,
+        "processed": 1,
+        "total": 1
+      },
+      "pdf": {
+        "sizeBytes": 191525,
+        "conversionTimeMs": 1115,
+        "requestTimeMs": 1140,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "EPAM Premier League - Men _ Congratulations Champions - Mighty Mavericks 🏆.msg",
+      "type": "MSG",
+      "originalSizeBytes": 26146816,
+      "evaluationMode": true,
+      "html": {
+        "sizeBytes": 2191249,
+        "conversionTimeMs": 882,
+        "requestTimeMs": 915,
+        "processed": 1,
+        "total": 1
+      },
+      "pdf": {
+        "sizeBytes": 170294,
+        "conversionTimeMs": 2637,
+        "requestTimeMs": 2652,
+        "requestMode": "range (first byte)"
+      }
+    },
+    {
+      "name": "Prudent Wellness Friday_ Festive Ready_ Let’s Get You There!.msg",
+      "type": "MSG",
+      "originalSizeBytes": 114688,
+      "evaluationMode": true,
+      "html": {
+        "sizeBytes": 3823,
+        "conversionTimeMs": 60,
+        "requestTimeMs": 63,
+        "processed": 1,
+        "total": 1
+      },
+      "pdf": {
+        "sizeBytes": 140347,
+        "conversionTimeMs": 359,
+        "requestTimeMs": 365,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "Shape the Future_ Become a Facilitator for the eKids AI for Good Eduthon.eml",
+      "type": "EML",
+      "originalSizeBytes": 48002,
+      "evaluationMode": true,
+      "html": {
+        "sizeBytes": 7678,
+        "conversionTimeMs": 34,
+        "requestTimeMs": 39,
+        "processed": 1,
+        "total": 1
+      },
+      "pdf": {
+        "sizeBytes": 147516,
+        "conversionTimeMs": 427,
+        "requestTimeMs": 445,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "Weekly Threat Intelligence Digest.eml",
+      "type": "EML",
+      "originalSizeBytes": 70846,
+      "evaluationMode": true,
+      "html": {
+        "sizeBytes": 18427,
+        "conversionTimeMs": 47,
+        "requestTimeMs": 51,
+        "processed": 1,
+        "total": 1
+      },
+      "pdf": {
+        "sizeBytes": 182291,
+        "conversionTimeMs": 571,
+        "requestTimeMs": 577,
+        "requestMode": "full download"
+      }
+    },
+    {
+      "name": "[Action required] Migrate your legacy user API keys.eml",
+      "type": "EML",
+      "originalSizeBytes": 17255,
+      "evaluationMode": true,
+      "html": {
+        "sizeBytes": 6207,
+        "conversionTimeMs": 14,
+        "requestTimeMs": 18,
+        "processed": 1,
+        "total": 1
+      },
+      "pdf": {
+        "sizeBytes": 127314,
+        "conversionTimeMs": 360,
+        "requestTimeMs": 385,
+        "requestMode": "full download"
       }
     }
   ]

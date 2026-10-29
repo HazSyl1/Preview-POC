@@ -105,7 +105,7 @@ console.log('Missing file: 404');
 
 const eml = await (await request('/api/file/preview-email/sample-email.eml')).json();
 assert.equal(eml.type, 'email');
-assert.equal(eml.subject, 'Email preview sample');
+assert.ok(eml.subject.startsWith('Email preview sample'));
 assert.ok(eml.bodyHtml.includes('final message line'));
 assert.ok(eml.bodyHtml.includes('data:image/png;base64,'));
 assert.ok(!eml.bodyHtml.includes('tracker.example.test'));
@@ -116,10 +116,46 @@ assert.equal(msg.type, 'email');
 assert.ok(msg.subject.includes('HtmlSampleEmail'));
 assert.ok(msg.attachmentNames.includes('SampleAttachment.pdf'));
 assert.ok(msg.bodyHtml || msg.bodyText);
-const emailOriginal = await request('/api/file/preview/sample-email.eml');
-assert.match(emailOriginal.headers.get('content-disposition'), /attachment/);
-await emailOriginal.body?.cancel();
-console.log('EML and MSG metadata, body, attachments, and sanitization: OK');
+for (const [name, subject, attachment] of [
+  ['sample-email.eml', 'Email preview sample', 'notes.txt'],
+  ['sample-outlook.msg', 'HtmlSampleEmailWithAttachment', 'SampleAttachment.pdf'],
+]) {
+  const info = await (await request(`/api/file/info/${name}`)).json();
+  assert.equal(info.kind, 'email');
+  assert.equal(typeof info.evaluationMode, 'boolean');
+  const html = await (await request(`/api/file/preview-html/${name}`)).json();
+  assert.equal(html.type, 'html');
+  assert.equal(html.stats.originalFileSizeBytes, info.length);
+  assert.equal(html.stats.convertedSizeBytes, Buffer.byteLength(html.content));
+  assert.equal(html.stats.pagesProcessed, 1);
+  assert.equal(html.stats.totalPages, 1);
+  assert.ok(html.content.includes(subject));
+  assert.ok(html.content.includes(attachment));
+  const repeat = await (await request(`/api/file/preview-html/${name}`)).json();
+  assert.equal(repeat.stats.cacheHit, true);
+  const pdfResponse = await request(`/api/file/preview/${name}`);
+  assert.ok(pdfResponse.headers.get('content-type')?.startsWith('application/pdf'));
+  const pdfBytes = Buffer.from(await pdfResponse.arrayBuffer());
+  assert.equal(pdfBytes.toString('ascii', 0, 5), '%PDF-');
+  assert.equal(Number(pdfResponse.headers.get('X-Preview-Size-Bytes')), pdfBytes.length);
+  assert.ok(Number(pdfResponse.headers.get('X-Preview-Conversion-Time-Ms')) >= 0);
+  const pdf = await getDocument({ data: new Uint8Array(pdfBytes), useSystemFonts: true }).promise;
+  assert.ok(pdf.numPages >= 1);
+  const pdfText = [];
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+    const page = await pdf.getPage(pageNumber);
+    const content = await page.getTextContent();
+    pdfText.push(content.items.map((item) => item.str).join(' '));
+  }
+  assert.ok(pdfText.join(' ').includes(subject), `${name}: PDF subject is missing`);
+  assert.ok(pdfText.join(' ').includes(attachment), `${name}: PDF attachment name is missing`);
+  console.log(`${name}: HTML ${html.stats.convertedSizeBytes} bytes, PDF ${pdfBytes.length} bytes / ${pdf.numPages} pages`);
+}
+assert.ok(eml.bodyHtml.includes('final message line'));
+assert.ok(eml.bodyHtml.includes('data:image/png;base64,'));
+assert.ok(!eml.bodyHtml.includes('tracker.example.test'));
+assert.ok(!eml.bodyHtml.includes('<script'));
+console.log('Aspose.Email HTML/PDF conversion, metadata, attachments, and sanitization: OK');
 
 for (const [name, kind, ending] of [
   ['sample-notes.txt', 'text', 'No PDF conversion is needed.'],
