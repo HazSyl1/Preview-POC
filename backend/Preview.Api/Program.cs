@@ -14,12 +14,22 @@ builder.Services.AddSingleton<EmailPreviewService>();
 builder.Services.AddSingleton<TextPreviewService>();
 
 var licensePath = builder.Configuration["Aspose:LicensePath"];
-if (!string.IsNullOrWhiteSpace(licensePath)) AsposeLicenses.Apply(ResolvePath(licensePath, builder.Environment.ContentRootPath));
+if (!string.IsNullOrWhiteSpace(licensePath))
+{
+    var resolvedLicensePath = ResolvePath(licensePath, builder.Environment.ContentRootPath);
+    if (File.Exists(resolvedLicensePath)) AsposeLicenses.Apply(resolvedLicensePath);
+    else Console.Error.WriteLine($"Aspose license was not found at {resolvedLicensePath}; Office previews will run in evaluation mode.");
+}
 var emailLicensePath = builder.Configuration["Aspose:EmailLicensePath"];
 if (!string.IsNullOrWhiteSpace(emailLicensePath))
 {
-    try { AsposeLicenses.ApplyEmail(ResolvePath(emailLicensePath, builder.Environment.ContentRootPath)); }
-    catch (Exception ex) { Console.Error.WriteLine($"Aspose.Email license could not be applied; email previews will run in evaluation mode: {ex.Message}"); }
+    var resolvedEmailLicensePath = ResolvePath(emailLicensePath, builder.Environment.ContentRootPath);
+    if (File.Exists(resolvedEmailLicensePath))
+    {
+        try { AsposeLicenses.ApplyEmail(resolvedEmailLicensePath); }
+        catch (Exception ex) { Console.Error.WriteLine($"Aspose.Email license could not be applied; email previews will run in evaluation mode: {ex.Message}"); }
+    }
+    else Console.Error.WriteLine($"Aspose.Email license was not found at {resolvedEmailLicensePath}; email previews will run in evaluation mode.");
 }
 
 var connectionString = builder.Configuration["AzureStorage:ConnectionString"];
