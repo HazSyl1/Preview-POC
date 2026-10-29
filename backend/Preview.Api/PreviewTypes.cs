@@ -14,6 +14,9 @@ public static class PreviewTypes
             ".gif" => ("image", "image/gif"),
             ".webp" => ("image", "image/webp"),
             ".txt" => ("text", "text/plain; charset=utf-8"),
+            ".md" => ("markdown", "text/plain; charset=utf-8"),
+            ".xml" => ("xml", "text/plain; charset=utf-8"),
+            ".eml" or ".msg" => ("email", "application/octet-stream"),
             _ => ("", "")
         };
         return kind.Length > 0;

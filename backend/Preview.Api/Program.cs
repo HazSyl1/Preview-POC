@@ -10,6 +10,8 @@ builder.Services.AddMemoryCache(options => options.SizeLimit = 64 * 1024 * 1024)
 builder.Services.AddSingleton<DocumentConverterService>();
 builder.Services.AddSingleton<PreviewService>();
 builder.Services.AddSingleton<HtmlPreviewService>();
+builder.Services.AddSingleton<EmailPreviewService>();
+builder.Services.AddSingleton<TextPreviewService>();
 
 var licensePath = builder.Configuration["Aspose:LicensePath"];
 if (!string.IsNullOrWhiteSpace(licensePath)) AsposeLicenses.Apply(licensePath);
@@ -97,6 +99,35 @@ app.MapGet("/api/file/preview-html/{**blobName}", async (string blobName, IFileS
     catch (NotSupportedException) { return Results.BadRequest(new { error = "Unsupported file type for HTML preview" }); }
 });
 
+app.MapGet("/api/file/preview-email/{**blobName}", async (string blobName, IFileSource source, EmailPreviewService previews, HttpContext http) =>
+{
+    try
+    {
+        var file = await source.GetInfoAsync(blobName, http.RequestAborted);
+        if (file is null) return Results.NotFound(new { error = "File not found" });
+        if (!PreviewTypes.TryGet(file.Name, out var kind, out _) || kind != "email")
+            return Results.BadRequest(new { error = "Unsupported file type for email preview" });
+        return Results.Ok(await previews.GetAsync(file, source, http.RequestAborted));
+    }
+    catch (ArgumentException) { return Results.BadRequest(new { error = "Invalid file name or email" }); }
+    catch (InvalidDataException) { return Results.BadRequest(new { error = "The email could not be parsed" }); }
+    catch (RequestFailedException ex) when (ex.Status == 404) { return Results.NotFound(new { error = "File not found" }); }
+});
+
+app.MapGet("/api/file/preview-text/{**blobName}", async (string blobName, IFileSource source, TextPreviewService previews, HttpContext http) =>
+{
+    try
+    {
+        var file = await source.GetInfoAsync(blobName, http.RequestAborted);
+        if (file is null) return Results.NotFound(new { error = "File not found" });
+        if (!PreviewTypes.TryGet(file.Name, out var kind, out _) || kind is not ("text" or "markdown" or "xml"))
+            return Results.BadRequest(new { error = "Unsupported file type for text preview" });
+        return Results.Ok(await previews.GetAsync(file, source, kind, http.RequestAborted));
+    }
+    catch (ArgumentException) { return Results.BadRequest(new { error = "Invalid file name" }); }
+    catch (RequestFailedException ex) when (ex.Status == 404) { return Results.NotFound(new { error = "File not found" }); }
+});
+
 app.MapGet("/api/file/preview/{**blobName}", async (string blobName, IFileSource source, PreviewService previews, HttpContext http) =>
 {
     try
@@ -105,7 +136,7 @@ app.MapGet("/api/file/preview/{**blobName}", async (string blobName, IFileSource
         if (file is null) return Results.NotFound();
         if (!PreviewTypes.TryGet(file.Name, out var kind, out var contentType)) return Results.BadRequest(new { error = "Unsupported file type" });
 
-        http.Response.Headers.ContentDisposition = "inline";
+        http.Response.Headers.ContentDisposition = kind == "email" ? "attachment" : "inline";
         if (kind != "office")
         {
             var stream = await source.OpenReadAsync(file, http.RequestAborted);

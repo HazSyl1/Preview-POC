@@ -7,13 +7,18 @@ Supported formats:
 - Word: `.doc`, `.docx`
 - Excel: `.xls`, `.xlsx`
 - PowerPoint: `.ppt`, `.pptx`
-- PDF, common images, and text files
+- PDF: `.pdf`
+- Email: `.eml`, `.msg`
+- Text: `.txt`, `.md`, `.xml`
+- Images: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`
 
 ## How it works
 
 Office files are loaded as streams by the ASP.NET backend and converted with the matching Aspose library. The HTML endpoint returns JSON containing generated HTML and conversion statistics. React renders the HTML in a sandboxed `iframe` using `srcDoc`. The PDF view uses the separate PDF streaming/conversion endpoint and `react-pdf`.
 
 The HTML conversion exports the complete document: all Word pages, Excel worksheets, and PowerPoint slides. Large HTML responses are held in memory because the POC returns HTML inside JSON; outputs over 100 MiB return HTTP 413.
+
+Email previews show the sender, recipients, subject, date, body, and attachment names. EML uses MimeKit; Outlook MSG uses MSGReader. HTML email is sanitized and displayed in a sandboxed iframe. Remote images are blocked; inline PNG/JPEG/GIF/WebP images referenced by content ID are embedded. Attachments are listed but not opened. Markdown is rendered with raw HTML disabled and remote images blocked. TXT and XML display as text; XML is indented when valid, or shown unchanged with a warning when parsing fails. These previews show the full accepted file content without an extra preview cutoff.
 
 ## Prerequisites
 
@@ -75,12 +80,16 @@ GET  /api/files
 POST /api/files
 GET  /api/file/info/{blobName}
 GET  /api/file/preview-html/{blobName}
+GET  /api/file/preview-email/{blobName}
+GET  /api/file/preview-text/{blobName}
 GET  /api/file/preview/{blobName}
 ```
 
 `/api/file/preview-html/{blobName}` returns JSON containing `type`, `content`, and `stats`. Statistics include original size, converted size, conversion time, cache status, and processed versus total pages, sheets, or slides.
 
 For an existing PDF, the HTML endpoint returns a note pointing to `/api/file/preview/{blobName}`. Unsupported file types return HTTP 400 and missing files return HTTP 404.
+
+`/api/file/preview-email/{blobName}` returns email metadata, sanitized `bodyHtml`, `bodyText`, `attachmentNames`, and `originalFileSizeBytes`. `/api/file/preview-text/{blobName}` returns `type`, full `content`, `originalFileSizeBytes`, and an optional `parseWarning`. The original EML/MSG can be downloaded through `/api/file/preview/{blobName}`.
 
 ## Project layout
 
@@ -135,5 +144,7 @@ npm run compare -- --format-only
 ## Repository notes
 
 The bundled samples and conversion evaluation files are intentionally included for this POC. Generated dependency/build folders and secrets are ignored, including `node_modules/`, `dist/`, `bin/`, `obj/`, environment files, and license files.
+
+`sample-outlook.msg` comes from [MSGReader's public test samples](https://github.com/Sicos1977/MSGReader/blob/master/MsgReaderTests/SampleFiles/HtmlSampleEmailWithAttachment.msg) (MIT license). It is included to exercise the MSG parser with a real Outlook file.
 
 This is a POC and does not yet include authorization, background conversion jobs, persistent caching, or production upload validation.
