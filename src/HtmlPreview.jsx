@@ -16,7 +16,7 @@ function emailFrameContent(content, showExternalImages) {
   return prepared.replace(/<head>/i, `<head>${hiddenImages}`);
 }
 
-export default function HtmlPreview({ blobName, attempt, emailEvaluationMode = false, showExternalImages = false, onToggleExternalImages }) {
+export default function HtmlPreview({ blobName, attempt, emailEvaluationMode = false, showExternalImages = true, onToggleExternalImages }) {
   const [result, setResult] = useState({ status: 'loading', content: '', stats: null, error: '' });
 
   useEffect(() => {

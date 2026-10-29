@@ -17,7 +17,7 @@ export default function FilePreview({ blobName, attempt }) {
   const [width, setWidth] = useState(760);
   const [convertedSize, setConvertedSize] = useState({ status: 'idle', bytes: null });
   const [mode, setMode] = useState('html');
-  const [showExternalImages, setShowExternalImages] = useState(false);
+  const [showExternalImages, setShowExternalImages] = useState(true);
   const viewerRef = useRef(null);
 
   useEffect(() => setPageDraft(String(pageNumber)), [pageNumber]);
@@ -48,7 +48,7 @@ export default function FilePreview({ blobName, attempt }) {
     const controller = new AbortController();
     setConvertedSize({ status: 'idle', bytes: null });
     setMode('html');
-    setShowExternalImages(false);
+    setShowExternalImages(true);
     setPageCount(0);
     setPageNumber(1);
     setState({ status: 'checking', info: null, error: '', name: blobName });
