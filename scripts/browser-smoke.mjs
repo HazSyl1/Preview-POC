@@ -79,7 +79,7 @@ try {
   assert.ok(emailHtml.includes('final message line'));
   assert.ok(emailHtml.includes('data:image/png;base64,'));
   assert.ok(emailHtml.includes(' src="https://tracker.example.test/pixel.png"'));
-  assert.ok(!emailHtml.includes('data-external-src="https://tracker.example.test/pixel.png"'));
+  assert.ok(!emailHtml.includes('data-external-src='));
   await page.frameLocator('iframe.html-frame').getByText('notes.txt').waitFor();
   await page.getByRole('button', { name: 'Full PDF' }).click();
   await page.getByText(/Page 1 of \d+/).waitFor();

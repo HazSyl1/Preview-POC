@@ -107,12 +107,11 @@ app.MapGet("/api/file/preview-html/{**blobName}", async (string blobName, IFileS
         var converted = await previews.GetAsync(file, source, http.RequestAborted);
         if (http.Request.Query.ContainsKey("open"))
         {
-            var externalImages = (extension is ".eml" or ".msg") && http.Request.Query["externalImages"] == "1";
             http.Response.Headers["Content-Security-Policy"] =
                 "frame-ancestors 'self'; sandbox; default-src 'none'; img-src data:" +
-                (externalImages ? " https: http:" : "") + "; font-src data:; style-src 'unsafe-inline' data:";
-            var content = externalImages ? EmailPreviewService.EnableExternalImages(converted.Content!) : converted.Content;
-            return Results.Content(content, "text/html; charset=utf-8");
+                (extension is ".eml" or ".msg" ? " https: http:" : "") +
+                "; font-src data:; style-src 'unsafe-inline' data:";
+            return Results.Content(converted.Content, "text/html; charset=utf-8");
         }
         return Results.Ok(converted);
     }

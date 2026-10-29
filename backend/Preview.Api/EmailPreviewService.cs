@@ -116,9 +116,6 @@ public sealed class EmailPreviewService
         if (!string.IsNullOrWhiteSpace(value)) html.Append("<dt>").Append(label).Append("</dt><dd>").Append(Encode(value)).Append("</dd>");
     }
 
-    public static string EnableExternalImages(string html) =>
-        Regex.Replace(html, "\\sdata-external-src=", " src=", RegexOptions.IgnoreCase);
-
     private static string RenderBody(MailMessage message, bool preserveExternalImages = false)
     {
         using var output = new MemoryStream();
@@ -134,6 +131,13 @@ public sealed class EmailPreviewService
         sanitizer.AllowedAtRules.Clear();
         sanitizer.AllowedSchemes.Add("data");
         sanitizer.AllowedSchemes.Add("mailto");
+        if (preserveExternalImages)
+        {
+            // Keep remote image URLs available for the main HTML preview.
+            // The element loop below still restricts src to http/https images.
+            sanitizer.AllowedSchemes.Add("http");
+            sanitizer.AllowedSchemes.Add("https");
+        }
         var document = new HtmlParser().ParseDocument(sanitizer.Sanitize(html));
         foreach (var element in document.All)
         {
@@ -145,13 +149,6 @@ public sealed class EmailPreviewService
                     (imageUri.Scheme == Uri.UriSchemeHttp || imageUri.Scheme == Uri.UriSchemeHttps);
                 if (element.LocalName != "img" || (!embedded && !external))
                     element.RemoveAttribute("src");
-                else if (external)
-                {
-                    // Keep remote URLs inert until the user explicitly enables them.
-                    // This prevents tracking pixels from loading during initial preview.
-                    element.SetAttribute("data-external-src", src);
-                    element.RemoveAttribute("src");
-                }
             }
             if (element.HasAttribute("href"))
             {
