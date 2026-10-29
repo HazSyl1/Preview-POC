@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import HtmlPreview from './HtmlPreview.jsx';
+import TextPreview from './TextPreview.jsx';
+import EmailPreview from './EmailPreview.jsx';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -92,7 +94,7 @@ export default function FilePreview({ blobName, attempt }) {
   return <section className="preview-panel" aria-labelledby="preview-title">
     <div className="preview-toolbar">
       <div className="preview-title-group"><span className="step">02</span><div><h2 id="preview-title">Document preview</h2><span className="status" role="status">{statusText}</span></div></div>
-      {info && <div className="preview-actions">{info.kind === 'office' && <><button type="button" aria-pressed={mode === 'html'} className={mode === 'html' ? 'preview-mode active' : 'preview-mode'} onClick={() => setMode('html')}>Full HTML</button><button type="button" aria-pressed={mode === 'pdf'} className={mode === 'pdf' ? 'preview-mode active' : 'preview-mode'} onClick={() => setMode('pdf')}>Full PDF</button></>}<a className="action-link" href={info.kind === 'office' && mode === 'html' ? openHtmlUrl : previewUrl} target="_blank" rel="noopener noreferrer">{info.kind === 'office' && mode === 'html' ? 'Open HTML ↗' : info.kind === 'office' || info.kind === 'pdf' ? 'Open PDF ↗' : 'Open file ↗'}</a></div>}
+      {info && <div className="preview-actions">{info.kind === 'office' && <><button type="button" aria-pressed={mode === 'html'} className={mode === 'html' ? 'preview-mode active' : 'preview-mode'} onClick={() => setMode('html')}>Full HTML</button><button type="button" aria-pressed={mode === 'pdf'} className={mode === 'pdf' ? 'preview-mode active' : 'preview-mode'} onClick={() => setMode('pdf')}>Full PDF</button></>}<a className="action-link" href={info.kind === 'office' && mode === 'html' ? openHtmlUrl : previewUrl} target="_blank" rel="noopener noreferrer">{info.kind === 'office' && mode === 'html' ? 'Open HTML ↗' : info.kind === 'office' || info.kind === 'pdf' ? 'Open PDF ↗' : info.kind === 'email' ? 'Download original' : 'Open file ↗'}</a></div>}
     </div>
     {info?.kind === 'office' && <div className="preview-sizes">{mode === 'html' ? 'Full view: all pages, slides, and sheets as HTML.' : 'Full view: all pages, slides, and sheets as PDF.'}</div>}
     {info && info.kind !== 'office' && <div className="preview-sizes"><span>Original: <strong>{formatSize(info.length)}</strong></span></div>}
@@ -113,6 +115,7 @@ export default function FilePreview({ blobName, attempt }) {
       </Document>
     </div>}
     {info?.kind === 'image' && <div className="image-preview"><img src={previewUrl} alt={`Preview of ${blobName}`} onLoad={() => setState((current) => ({ ...current, status: 'ready' }))}/></div>}
-    {info?.kind === 'text' && <iframe key={previewUrl} className="pdf-frame" src={previewUrl} title={`Text preview of ${blobName}`} onLoad={() => setState((current) => ({ ...current, status: 'ready' }))}/>}
+    {['text', 'markdown', 'xml'].includes(info?.kind) && <TextPreview blobName={blobName} attempt={attempt} kind={info.kind} onReady={() => setState((current) => ({ ...current, status: 'ready' }))}/>}
+    {info?.kind === 'email' && <EmailPreview blobName={blobName} attempt={attempt} onReady={() => setState((current) => ({ ...current, status: 'ready' }))}/>}
   </section>;
 }

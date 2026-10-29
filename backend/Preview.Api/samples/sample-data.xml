@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<preview>
+  <title>XML preview sample</title>
+  <items>
+    <item id="1">First item</item>
+    <item id="2">Final item</item>
+  </items>
+</preview>

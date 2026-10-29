@@ -20,7 +20,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 950 }, deviceScaleFactor: 1 });
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('http://127.0.0.1:5175/', { waitUntil: 'networkidle' });
+  await page.goto(process.env.PREVIEW_WEB_URL || 'http://127.0.0.1:5175/', { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: /sample-word\.docx/ }).click();
   await page.locator('iframe.html-frame').waitFor();
   await page.locator('.html-stats').getByText('7 / 7').waitFor();
@@ -32,7 +32,7 @@ try {
   await page.getByText('Ready to review').waitFor();
   const pdfStats = page.locator('[aria-label="PDF conversion performance stats"]');
   await pdfStats.waitFor();
-  assert.match(await pdfStats.textContent(), /Conversion\s+\d+ ms/);
+  assert.match(await pdfStats.textContent(), /Conversion\s+[\d,]+ ms/);
   await page.getByText(/Page 1 of [7-9]\d*/).waitFor();
   assert.ok(await page.locator('.react-pdf__Page canvas').isVisible());
   await mkdir('artifacts', { recursive: true });
@@ -64,10 +64,26 @@ try {
   await page.locator('.image-preview img').waitFor();
   assert.ok(await page.locator('.image-preview img').evaluate((image) => image.naturalWidth > 0));
   await page.getByRole('button', { name: /sample-notes\.txt/ }).click();
-  await page.locator('iframe.pdf-frame').waitFor();
-  assert.ok(await page.locator('iframe.pdf-frame').isVisible());
+  await page.locator('.source-text').getByText(/No PDF conversion is needed/).waitFor();
+  await page.getByRole('button', { name: /sample-markdown\.md/ }).click();
+  await page.locator('.markdown-body strong').getByText('formatted').waitFor();
+  await page.locator('.markdown-body').getByText('The final line should be visible.').waitFor();
+  await page.getByRole('button', { name: /sample-data\.xml/ }).click();
+  await page.locator('.source-text').getByText(/Final item/).waitFor();
+  await page.getByRole('button', { name: /sample-email\.eml/ }).click();
+  const emailFrame = page.locator('iframe.email-frame');
+  await emailFrame.waitFor();
+  assert.equal(await emailFrame.getAttribute('sandbox'), '');
+  const emailHtml = await emailFrame.getAttribute('srcdoc');
+  assert.ok(emailHtml.includes('final message line'));
+  assert.ok(emailHtml.includes('data:image/png;base64,'));
+  assert.ok(!emailHtml.includes('tracker.example.test'));
+  await page.locator('.email-attachments').getByText('notes.txt').waitFor();
+  await page.getByRole('button', { name: /sample-outlook\.msg/ }).click();
+  await page.locator('.email-headers').getByText('HtmlSampleEmailWithAttachment').waitFor();
+  await page.locator('.email-attachments').getByText('SampleAttachment.pdf').waitFor();
   assert.deepEqual(errors, []);
-  console.log('React preview: full HTML stats and sandbox, full PDF, image, and text opened without page errors');
+  console.log('React preview: Office, PDF, image, TXT, Markdown, XML, EML, and MSG opened without page errors');
   console.log('Screenshot: artifacts/word-preview.png');
 } finally {
   await browser.close();

@@ -13,7 +13,7 @@ async function request(path, options) {
 }
 
 const list = await (await request('/api/files')).json();
-for (const name of ['sample-pdf.pdf', 'sample-word.docx', 'sample-excel.xlsx', 'sample-slides.pptx', 'sample-notes.txt', 'sample-image.png']) {
+for (const name of ['sample-pdf.pdf', 'sample-word.docx', 'sample-excel.xlsx', 'sample-slides.pptx', 'sample-notes.txt', 'sample-image.png', 'sample-markdown.md', 'sample-data.xml', 'sample-email.eml', 'sample-outlook.msg']) {
   assert.ok(list.includes(name), `${name} was not generated`);
 }
 
@@ -102,3 +102,85 @@ try {
 const missing = await fetch(`${api}/api/file/info/does-not-exist.pdf`);
 assert.equal(missing.status, 404);
 console.log('Missing file: 404');
+
+const eml = await (await request('/api/file/preview-email/sample-email.eml')).json();
+assert.equal(eml.type, 'email');
+assert.equal(eml.subject, 'Email preview sample');
+assert.ok(eml.bodyHtml.includes('final message line'));
+assert.ok(eml.bodyHtml.includes('data:image/png;base64,'));
+assert.ok(!eml.bodyHtml.includes('tracker.example.test'));
+assert.ok(!eml.bodyHtml.includes('<script'));
+assert.deepEqual(eml.attachmentNames, ['notes.txt']);
+const msg = await (await request('/api/file/preview-email/sample-outlook.msg')).json();
+assert.equal(msg.type, 'email');
+assert.ok(msg.subject.includes('HtmlSampleEmail'));
+assert.ok(msg.attachmentNames.includes('SampleAttachment.pdf'));
+assert.ok(msg.bodyHtml || msg.bodyText);
+const emailOriginal = await request('/api/file/preview/sample-email.eml');
+assert.match(emailOriginal.headers.get('content-disposition'), /attachment/);
+await emailOriginal.body?.cancel();
+console.log('EML and MSG metadata, body, attachments, and sanitization: OK');
+
+for (const [name, kind, ending] of [
+  ['sample-notes.txt', 'text', 'No PDF conversion is needed.'],
+  ['sample-markdown.md', 'markdown', 'The final line should be visible.'],
+  ['sample-data.xml', 'xml', '</preview>'],
+]) {
+  const info = await (await request(`/api/file/info/${name}`)).json();
+  assert.equal(info.kind, kind);
+  const result = await (await request(`/api/file/preview-text/${name}`)).json();
+  assert.equal(result.type, kind);
+  assert.ok(result.content.trimEnd().endsWith(ending));
+  assert.equal(result.parseWarning, null);
+}
+assert.equal((await fetch(`${api}/api/file/preview-text/sample-pdf.pdf`)).status, 400);
+assert.equal((await fetch(`${api}/api/file/preview-email/sample-notes.txt`)).status, 400);
+
+const invalidXml = await request('/api/files', { method: 'POST', headers: { 'X-File-Name': 'invalid.xml' }, body: '<root><unclosed></root>' });
+const invalidXmlName = (await invalidXml.json()).name;
+try {
+  const result = await (await request(`/api/file/preview-text/${invalidXmlName}`)).json();
+  assert.equal(result.content, '<root><unclosed></root>');
+  assert.match(result.parseWarning, /could not be formatted/);
+} finally { await unlink(join(samples, invalidXmlName)); }
+
+const longText = `Start\n${'X'.repeat(200_000)}\nFinal line`;
+const longUpload = await request('/api/files', { method: 'POST', headers: { 'X-File-Name': 'long.txt' }, body: longText });
+const longName = (await longUpload.json()).name;
+try {
+  const result = await (await request(`/api/file/preview-text/${longName}`)).json();
+  assert.equal(result.content, longText);
+} finally { await unlink(join(samples, longName)); }
+console.log('TXT, Markdown, XML, malformed XML, and full text content: OK');
+
+const imageBytes = await readFile(join(samples, 'sample-image.png'));
+for (const [extension, mime] of [['jpg', 'image/jpeg'], ['gif', 'image/gif'], ['webp', 'image/webp']]) {
+  const uploaded = await request('/api/files', { method: 'POST', headers: { 'X-File-Name': `image-check.${extension}` }, body: imageBytes });
+  const imageName = (await uploaded.json()).name;
+  try {
+    const info = await (await request(`/api/file/info/${imageName}`)).json();
+    assert.equal(info.kind, 'image');
+    const response = await request(`/api/file/preview/${imageName}`);
+    assert.ok(response.headers.get('content-type')?.startsWith(mime));
+    assert.deepEqual(Buffer.from(await response.arrayBuffer()), imageBytes);
+  } finally { await unlink(join(samples, imageName)); }
+}
+console.log('JPEG, GIF, and WebP type routing and direct streaming: OK');
+
+for (const [fileName, body, path, status] of [
+  ['broken.msg', 'not an Outlook message', 'preview-email', 400],
+  ['external.xml', '<!DOCTYPE root [<!ENTITY secret SYSTEM "file:///does-not-exist">]><root>&secret;</root>', 'preview-text', 200],
+]) {
+  const uploaded = await request('/api/files', { method: 'POST', headers: { 'X-File-Name': fileName }, body });
+  const storedName = (await uploaded.json()).name;
+  try {
+    const response = await fetch(`${api}/api/file/${path}/${storedName}`);
+    assert.equal(response.status, status);
+    if (status === 200) {
+      const result = await response.json();
+      assert.equal(result.content, body);
+      assert.ok(result.parseWarning);
+    }
+  } finally { await unlink(join(samples, storedName)); }
+}
+console.log('Malformed MSG and XML external entity handling: OK');
