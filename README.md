@@ -50,16 +50,21 @@ Open <http://127.0.0.1:5175> and select a sample file, enter a file name, or upl
 
 ## Aspose license
 
-Without a license, Aspose adds evaluation watermarks. Set the license path before starting the backend:
+Place the license file in `backend/Preview.Api/` using this name:
+
+```text
+Aspose.Total.NET.lic
+```
+
+The paths are already configured in `backend/Preview.Api/appsettings.json`. Without a license, Aspose adds evaluation watermarks. Do not commit the `.lic` files.
 
 ```powershell
-$env:Aspose__LicensePath="C:\path\to\Aspose.Total.lic"
+$env:Aspose__LicensePath="C:\path\to\Aspose.Total.NET.lic"
+$env:Aspose__EmailLicensePath="C:\path\to\Aspose.Total.NET.lic"
 dotnet run --urls http://localhost:5050
 ```
 
-Do not commit the license file.
-
-If Aspose.Email has a separate license file, also set `$env:Aspose__EmailLicensePath="C:\path\to\Aspose.Email.lic"`. Without an Aspose.Email license, email conversion runs in evaluation mode. In that mode, [Aspose.Email extracts only three attachments or inline images from an MSG file](https://docs.aspose.com/email/net/licensing-and-limitations/), so image-heavy MSG previews will have missing images. The UI and comparison report identify evaluation results.
+Without an Aspose.Email license, email conversion runs in evaluation mode. In that mode, [Aspose.Email extracts only three attachments or inline images from an MSG file](https://docs.aspose.com/email/net/licensing-and-limitations/), so image-heavy MSG previews will have missing images. The UI and comparison report identify evaluation results.
 
 ## Azure Blob Storage
 

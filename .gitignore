@@ -7,3 +7,4 @@ artifacts/*
 !artifacts/conversion-report.md
 !artifacts/conversion-comparison.json
 .npm-cache/
+*.lic

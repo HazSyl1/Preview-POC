@@ -14,9 +14,13 @@ builder.Services.AddSingleton<EmailPreviewService>();
 builder.Services.AddSingleton<TextPreviewService>();
 
 var licensePath = builder.Configuration["Aspose:LicensePath"];
-if (!string.IsNullOrWhiteSpace(licensePath)) AsposeLicenses.Apply(licensePath);
+if (!string.IsNullOrWhiteSpace(licensePath)) AsposeLicenses.Apply(ResolvePath(licensePath, builder.Environment.ContentRootPath));
 var emailLicensePath = builder.Configuration["Aspose:EmailLicensePath"];
-if (!string.IsNullOrWhiteSpace(emailLicensePath)) AsposeLicenses.ApplyEmail(emailLicensePath);
+if (!string.IsNullOrWhiteSpace(emailLicensePath))
+{
+    try { AsposeLicenses.ApplyEmail(ResolvePath(emailLicensePath, builder.Environment.ContentRootPath)); }
+    catch (Exception ex) { Console.Error.WriteLine($"Aspose.Email license could not be applied; email previews will run in evaluation mode: {ex.Message}"); }
+}
 
 var connectionString = builder.Configuration["AzureStorage:ConnectionString"];
 var containerName = builder.Configuration["AzureStorage:ContainerName"];
@@ -166,3 +170,6 @@ app.MapGet("/api/file/preview/{**blobName}", async (string blobName, IFileSource
 });
 
 app.Run();
+
+static string ResolvePath(string path, string contentRoot) =>
+    Path.IsPathRooted(path) ? path : Path.Combine(contentRoot, path);
