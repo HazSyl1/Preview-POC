@@ -18,7 +18,7 @@ Office files are loaded as streams by the ASP.NET backend and converted with the
 
 The HTML conversion exports the complete document: all Word pages, Excel worksheets, and PowerPoint slides. Large HTML responses are held in memory because the POC returns HTML inside JSON; outputs over 100 MiB return HTTP 413.
 
-EML and MSG are loaded with Aspose.Email. Its HTML export embeds inline images; the server sanitizes the result and React displays it in a sandboxed iframe. For PDF, Aspose.Email creates MHTML in memory and Aspose.Words renders that stream as PDF. Email headers and attachment names are included; attachment contents are not rendered. Both modes report original/output size and conversion time through the same preview endpoints as Office files. Markdown is rendered with raw HTML disabled and remote images blocked. TXT and XML display as text; XML is indented when valid, or shown unchanged with a warning when parsing fails. These previews show the full accepted file content without an extra preview cutoff.
+EML and MSG are loaded with Aspose.Email. Its HTML export embeds inline images; the server sanitizes the result and React displays it in a sandboxed iframe. Emails can also reference images hosted on external websites. These are blocked by default; use **Show external images** in the HTML preview to load HTTP or HTTPS images from their original hosts. Browsers may block HTTP images when the app is served over HTTPS. For PDF, Aspose.Email creates MHTML in memory and Aspose.Words renders that stream as PDF. Email headers and attachment names are included; attachment contents are not rendered. Both modes report original/output size and conversion time through the same preview endpoints as Office files. Markdown is rendered with raw HTML disabled and remote images blocked. TXT and XML display as text; XML is indented when valid, or shown unchanged with a warning when parsing fails. These previews show the full accepted file content without an extra preview cutoff.
 
 ## Prerequisites
 
@@ -59,7 +59,7 @@ dotnet run --urls http://localhost:5050
 
 Do not commit the license file.
 
-If Aspose.Email has a separate license file, also set `$env:Aspose__EmailLicensePath="C:\path\to\Aspose.Email.lic"`. Without an Aspose.Email license, email conversion runs in evaluation mode and may alter the subject or limit attachments. The UI and comparison report identify evaluation results.
+If Aspose.Email has a separate license file, also set `$env:Aspose__EmailLicensePath="C:\path\to\Aspose.Email.lic"`. Without an Aspose.Email license, email conversion runs in evaluation mode. In that mode, [Aspose.Email extracts only three attachments or inline images from an MSG file](https://docs.aspose.com/email/net/licensing-and-limitations/), so image-heavy MSG previews will have missing images. The UI and comparison report identify evaluation results.
 
 ## Azure Blob Storage
 

@@ -36,7 +36,7 @@ public sealed class EmailPreviewService
         try
         {
             using var message = Load(input, extension);
-            var body = RenderBody(message);
+            var body = RenderBody(message, preserveExternalImages: true);
             var attachments = AttachmentNames(message);
             var header = new StringBuilder("<section class=\"mail-header\"><h1>")
                 .Append(Encode(message.Subject ?? "(No subject)"))
@@ -116,7 +116,10 @@ public sealed class EmailPreviewService
         if (!string.IsNullOrWhiteSpace(value)) html.Append("<dt>").Append(label).Append("</dt><dd>").Append(Encode(value)).Append("</dd>");
     }
 
-    private static string RenderBody(MailMessage message)
+    public static string EnableExternalImages(string html) =>
+        Regex.Replace(html, "\\sdata-external-src=", " src=", RegexOptions.IgnoreCase);
+
+    private static string RenderBody(MailMessage message, bool preserveExternalImages = false)
     {
         using var output = new MemoryStream();
         message.Save(output, new HtmlSaveOptions { ResourceRenderingMode = ResourceRenderingMode.EmbedIntoHtml });
@@ -137,8 +140,18 @@ public sealed class EmailPreviewService
             if (element.HasAttribute("src"))
             {
                 var src = element.GetAttribute("src") ?? "";
-                if (element.LocalName != "img" || !Regex.IsMatch(src, "^data:image/(png|jpeg|gif|webp);base64,[a-z0-9+/=]+$", RegexOptions.IgnoreCase))
+                var embedded = Regex.IsMatch(src, "^data:image/(png|jpeg|gif|webp);base64,[a-z0-9+/=]+$", RegexOptions.IgnoreCase);
+                var external = preserveExternalImages && Uri.TryCreate(src, UriKind.Absolute, out var imageUri) &&
+                    (imageUri.Scheme == Uri.UriSchemeHttp || imageUri.Scheme == Uri.UriSchemeHttps);
+                if (element.LocalName != "img" || (!embedded && !external))
                     element.RemoveAttribute("src");
+                else if (external)
+                {
+                    // Keep remote URLs inert until the user explicitly enables them.
+                    // This prevents tracking pixels from loading during initial preview.
+                    element.SetAttribute("data-external-src", src);
+                    element.RemoveAttribute("src");
+                }
             }
             if (element.HasAttribute("href"))
             {

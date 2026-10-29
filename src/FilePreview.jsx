@@ -17,6 +17,7 @@ export default function FilePreview({ blobName, attempt }) {
   const [width, setWidth] = useState(760);
   const [convertedSize, setConvertedSize] = useState({ status: 'idle', bytes: null });
   const [mode, setMode] = useState('html');
+  const [showExternalImages, setShowExternalImages] = useState(false);
   const viewerRef = useRef(null);
 
   useEffect(() => setPageDraft(String(pageNumber)), [pageNumber]);
@@ -47,6 +48,7 @@ export default function FilePreview({ blobName, attempt }) {
     const controller = new AbortController();
     setConvertedSize({ status: 'idle', bytes: null });
     setMode('html');
+    setShowExternalImages(false);
     setPageCount(0);
     setPageNumber(1);
     setState({ status: 'checking', info: null, error: '', name: blobName });
@@ -66,7 +68,7 @@ export default function FilePreview({ blobName, attempt }) {
   }, [blobName, attempt]);
 
   const previewUrl = blobName ? `/api/file/preview/${encodeURIComponent(blobName)}?attempt=${attempt}` : '';
-  const openHtmlUrl = blobName ? `/api/file/preview-html/${encodeURIComponent(blobName)}?open=1` : '';
+  const openHtmlUrl = blobName ? `/api/file/preview-html/${encodeURIComponent(blobName)}?open=1${showExternalImages && /\.(eml|msg)$/i.test(blobName) ? '&externalImages=1' : ''}` : '';
   const info = state.name === blobName ? state.info : null;
   const isConvertible = info?.kind === 'office' || info?.kind === 'email';
   useEffect(() => {
@@ -108,7 +110,7 @@ export default function FilePreview({ blobName, attempt }) {
     </div>}
     {state.status === 'error' && <div className="preview-error" role="alert">{state.error}</div>}
     {!info && state.status !== 'error' && <div className="preview-empty"><div className="paper-stack" aria-hidden="true"><div className="paper paper-back"/><div className="paper paper-front"><div className="paper-header"><span/><span/></div><div className="paper-line wide"/><div className="paper-line"/><div className="paper-line short"/><div className="paper-block"/><div className="paper-line"/><div className="paper-line short"/><div className="paper-stamp">FILE</div></div></div><h3>Preview from storage</h3><p>Select a file to render it in the browser.</p></div>}
-    {isConvertible && mode === 'html' && <HtmlPreview blobName={blobName} attempt={attempt}/>}
+    {isConvertible && mode === 'html' && <HtmlPreview blobName={blobName} attempt={attempt} emailEvaluationMode={info.kind === 'email' && info.evaluationMode} showExternalImages={showExternalImages} onToggleExternalImages={() => setShowExternalImages((value) => !value)}/>}
     {isPdf && <div className="react-pdf-viewer" ref={viewerRef}>
       {pageCount > 0 && <div className="page-controls"><button type="button" disabled={pageNumber <= 1} onClick={() => setPageNumber((value) => value - 1)}>← Previous</button><span>Page {pageNumber} of {pageCount}</span><button type="button" disabled={pageNumber >= pageCount} onClick={() => setPageNumber((value) => value + 1)}>Next →</button><label className="page-jump">Jump to <input type="number" min="1" max={pageCount} value={pageDraft} aria-label="Page number" onChange={(event) => setPageDraft(event.target.value)} onBlur={commitPage} onKeyDown={(event) => { if (event.key === 'Enter') event.currentTarget.blur(); if (event.key === 'Escape') setPageDraft(String(pageNumber)); }}/></label></div>}
       <Document key={previewUrl} file={previewUrl} options={pdfOptions} suspense={false} loading={<p className="viewer-message">Loading PDF…</p>} error={<p className="viewer-message error-message">Could not render this PDF.</p>} onLoadSuccess={({ numPages }) => { setPageCount(numPages); setState((current) => ({ ...current, status: 'ready' })); }} onLoadError={(error) => setState((current) => ({ ...current, status: 'error', error: error.message }))}>

@@ -129,7 +129,7 @@ const lines = [
   '',
   `Measured: ${generatedAt}`,
   '',
-  'HTML and PDF conversions cover the complete source document or email body. Email attachment names are included; attachment contents are not rendered. The values are a snapshot of the endpoints at measurement time.',
+  'HTML and PDF conversions cover the complete source document or email body. Email attachment names are included; attachment contents are not rendered. HTML output size includes embedded images but excludes externally hosted images, which the browser loads only after the user opts in. Aspose.Email evaluation mode limits MSG extraction to three attachments or inline images, so those previews can omit images. The values are a snapshot of the endpoints at measurement time.',
   '',
 ];
 const largeExcel = results.filter((item) => (item.type === 'XLS' || item.type === 'XLSX') && item.originalSizeBytes >= 10 * 1024 * 1024);
