@@ -1,6 +1,6 @@
 # File conversion comparison
 
-Measured: 2026-10-29T10:28:17.141Z
+Measured: 2026-10-29T10:37:58.492Z
 
 HTML and PDF conversions cover the complete source document or email body. Email attachment names are included; attachment contents are not rendered. The values are a snapshot of the endpoints at measurement time.
 
@@ -108,8 +108,8 @@ Original: **1,240 bytes (1.2 KiB)**
 
 | Format | Output | Conversion | Request | Result |
 | --- | ---: | ---: | ---: | --- |
-| HTML | 1,446 bytes (1.4 KiB) | 34 ms | 37 ms | Aspose.Email evaluation mode |
-| PDF | 100,477 bytes (98.1 KiB) | 159 ms | 166 ms | Aspose.Email evaluation mode |
+| HTML | 1,446 bytes (1.4 KiB) | 54 ms | 58 ms | Aspose.Email evaluation mode |
+| PDF | 100,477 bytes (98.1 KiB) | 313 ms | 321 ms | Aspose.Email evaluation mode |
 
 ### Shape the Future_ Become a Facilitator for the eKids AI for Good Eduthon.eml
 
@@ -117,8 +117,8 @@ Original: **48,002 bytes (46.9 KiB)**
 
 | Format | Output | Conversion | Request | Result |
 | --- | ---: | ---: | ---: | --- |
-| HTML | 7,678 bytes (7.5 KiB) | 34 ms | 39 ms | Aspose.Email evaluation mode |
-| PDF | 147,516 bytes (144.1 KiB) | 427 ms | 445 ms | Aspose.Email evaluation mode |
+| HTML | 7,678 bytes (7.5 KiB) | 55 ms | 62 ms | Aspose.Email evaluation mode |
+| PDF | 147,516 bytes (144.1 KiB) | 965 ms | 973 ms | Aspose.Email evaluation mode |
 
 ### Weekly Threat Intelligence Digest.eml
 
@@ -126,8 +126,8 @@ Original: **70,846 bytes (69.2 KiB)**
 
 | Format | Output | Conversion | Request | Result |
 | --- | ---: | ---: | ---: | --- |
-| HTML | 18,427 bytes (18.0 KiB) | 47 ms | 51 ms | Aspose.Email evaluation mode |
-| PDF | 182,291 bytes (178.0 KiB) | 571 ms | 577 ms | Aspose.Email evaluation mode |
+| HTML | 18,427 bytes (18.0 KiB) | 88 ms | 94 ms | Aspose.Email evaluation mode |
+| PDF | 182,291 bytes (178.0 KiB) | 1,181 ms | 1,220 ms | Aspose.Email evaluation mode |
 
 ### [Action required] Migrate your legacy user API keys.eml
 
@@ -135,8 +135,8 @@ Original: **17,255 bytes (16.9 KiB)**
 
 | Format | Output | Conversion | Request | Result |
 | --- | ---: | ---: | ---: | --- |
-| HTML | 6,207 bytes (6.1 KiB) | 14 ms | 18 ms | Aspose.Email evaluation mode |
-| PDF | 127,314 bytes (124.3 KiB) | 360 ms | 385 ms | Aspose.Email evaluation mode |
+| HTML | 6,207 bytes (6.1 KiB) | 34 ms | 41 ms | Aspose.Email evaluation mode |
+| PDF | 127,314 bytes (124.3 KiB) | 809 ms | 821 ms | Aspose.Email evaluation mode |
 
 ## MSG
 
@@ -146,8 +146,8 @@ Original: **209,408 bytes (204.5 KiB)**
 
 | Format | Output | Conversion | Request | Result |
 | --- | ---: | ---: | ---: | --- |
-| HTML | 2,230 bytes (2.2 KiB) | 51 ms | 54 ms | Aspose.Email evaluation mode |
-| PDF | 126,458 bytes (123.5 KiB) | 268 ms | 274 ms | Aspose.Email evaluation mode |
+| HTML | 2,230 bytes (2.2 KiB) | 49 ms | 55 ms | Aspose.Email evaluation mode |
+| PDF | 126,458 bytes (123.5 KiB) | 529 ms | 539 ms | Aspose.Email evaluation mode |
 
 ### Did you fill_.msg
 
@@ -155,8 +155,8 @@ Original: **242,688 bytes (237.0 KiB)**
 
 | Format | Output | Conversion | Request | Result |
 | --- | ---: | ---: | ---: | --- |
-| HTML | 152,702 bytes (149.1 KiB) | 1,422 ms | 1,492 ms | Aspose.Email evaluation mode |
-| PDF | 180,414 bytes (176.2 KiB) | 3,022 ms | 3,046 ms | Aspose.Email evaluation mode |
+| HTML | 152,702 bytes (149.1 KiB) | 1,873 ms | 1,957 ms | Aspose.Email evaluation mode |
+| PDF | 180,414 bytes (176.2 KiB) | 4,207 ms | 4,241 ms | Aspose.Email evaluation mode |
 
 ### EPAM Daily Digest.msg
 
@@ -164,8 +164,8 @@ Original: **317,440 bytes (310.0 KiB)**
 
 | Format | Output | Conversion | Request | Result |
 | --- | ---: | ---: | ---: | --- |
-| HTML | 30,181 bytes (29.5 KiB) | 247 ms | 252 ms | Aspose.Email evaluation mode |
-| PDF | 191,525 bytes (187.0 KiB) | 1,115 ms | 1,140 ms | Aspose.Email evaluation mode |
+| HTML | 30,181 bytes (29.5 KiB) | 329 ms | 334 ms | Aspose.Email evaluation mode |
+| PDF | 191,525 bytes (187.0 KiB) | 1,598 ms | 1,638 ms | Aspose.Email evaluation mode |
 
 ### EPAM Premier League - Men _ Congratulations Champions - Mighty Mavericks 🏆.msg
 
@@ -173,8 +173,8 @@ Original: **26,146,816 bytes (24.94 MiB)**
 
 | Format | Output | Conversion | Request | Result |
 | --- | ---: | ---: | ---: | --- |
-| HTML | 2,191,249 bytes (2.09 MiB) | 882 ms | 915 ms | Aspose.Email evaluation mode |
-| PDF | 170,294 bytes (166.3 KiB) | 2,637 ms | 2,652 ms | Aspose.Email evaluation mode |
+| HTML | 2,191,249 bytes (2.09 MiB) | 1,671 ms | 1,729 ms | Aspose.Email evaluation mode |
+| PDF | 170,294 bytes (166.3 KiB) | 4,191 ms | 4,213 ms | Aspose.Email evaluation mode |
 
 ### Prudent Wellness Friday_ Festive Ready_ Let’s Get You There!.msg
 
@@ -182,8 +182,8 @@ Original: **114,688 bytes (112.0 KiB)**
 
 | Format | Output | Conversion | Request | Result |
 | --- | ---: | ---: | ---: | --- |
-| HTML | 3,823 bytes (3.7 KiB) | 60 ms | 63 ms | Aspose.Email evaluation mode |
-| PDF | 140,347 bytes (137.1 KiB) | 359 ms | 365 ms | Aspose.Email evaluation mode |
+| HTML | 3,823 bytes (3.7 KiB) | 111 ms | 116 ms | Aspose.Email evaluation mode |
+| PDF | 140,347 bytes (137.1 KiB) | 522 ms | 545 ms | Aspose.Email evaluation mode |
 
 **Timing:** Conversion is the server-recorded export time; request is the measured time to receive the response.
 
