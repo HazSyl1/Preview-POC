@@ -66,6 +66,8 @@ dotnet run --urls http://localhost:5050
 
 Without an Aspose.Email license, email conversion runs in evaluation mode. In that mode, [Aspose.Email extracts only three attachments or inline images from an MSG file](https://docs.aspose.com/email/net/licensing-and-limitations/), so image-heavy MSG previews will have missing images. The UI and comparison report identify evaluation results.
 
+If the license predates the installed Aspose package versions, startup logs a license-version warning and continues in evaluation mode. Renew the license or pin the Aspose packages to versions released before the license subscription end date for licensed output.
+
 ## Azure Blob Storage
 
 Set both values before starting the backend:

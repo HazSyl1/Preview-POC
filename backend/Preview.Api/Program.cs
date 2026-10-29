@@ -17,7 +17,11 @@ var licensePath = builder.Configuration["Aspose:LicensePath"];
 if (!string.IsNullOrWhiteSpace(licensePath))
 {
     var resolvedLicensePath = ResolvePath(licensePath, builder.Environment.ContentRootPath);
-    if (File.Exists(resolvedLicensePath)) AsposeLicenses.Apply(resolvedLicensePath);
+    if (File.Exists(resolvedLicensePath))
+    {
+        try { AsposeLicenses.Apply(resolvedLicensePath); }
+        catch (Exception ex) { Console.Error.WriteLine($"Aspose license could not be applied; Office previews will run in evaluation mode. Renew the license or use an Aspose package version covered by it. Details: {ex.Message}"); }
+    }
     else Console.Error.WriteLine($"Aspose license was not found at {resolvedLicensePath}; Office previews will run in evaluation mode.");
 }
 var emailLicensePath = builder.Configuration["Aspose:EmailLicensePath"];
