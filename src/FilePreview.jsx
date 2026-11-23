@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import HtmlPreview from './HtmlPreview.jsx';
 import TextPreview from './TextPreview.jsx';
+import OpenInOutlookButton from './OpenInOutlookButton.jsx';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -96,6 +97,8 @@ export default function FilePreview({ blobName, attempt }) {
       <div className="preview-title-group"><span className="step">02</span><div><h2 id="preview-title">Document preview</h2><span className="status" role="status">{statusText}</span></div></div>
       {info && <div className="preview-actions">{isConvertible && <><button type="button" aria-pressed={mode === 'html'} className={mode === 'html' ? 'preview-mode active' : 'preview-mode'} onClick={() => setMode('html')}>Full HTML</button><button type="button" aria-pressed={mode === 'pdf'} className={mode === 'pdf' ? 'preview-mode active' : 'preview-mode'} onClick={() => setMode('pdf')}>Full PDF</button></>}<a className="action-link" href={isConvertible && mode === 'html' ? openHtmlUrl : previewUrl} target="_blank" rel="noopener noreferrer">{isConvertible && mode === 'html' ? 'Open HTML ↗' : isConvertible || info.kind === 'pdf' ? 'Open PDF ↗' : 'Open file ↗'}</a></div>}
     </div>
+    {info && <div className="download-original"><a className="action-link" href={`/api/file/download/${encodeURIComponent(blobName)}`}>Download original file</a></div>}
+    {info?.kind === 'email' && <div className="download-original"><OpenInOutlookButton blobName={blobName}/></div>}
     {isConvertible && <div className="preview-sizes">{info.kind === 'email' ? `Full email view as ${mode.toUpperCase()}; attachment names are included.` : mode === 'html' ? 'Full view: all pages, slides, and sheets as HTML.' : 'Full view: all pages, slides, and sheets as PDF.'}</div>}
     {info?.kind === 'email' && info.evaluationMode && <div className="preview-sizes">Aspose.Email evaluation mode is active. Add an Aspose.Email license for unrestricted previews.</div>}
     {info && !isConvertible && <div className="preview-sizes"><span>Original: <strong>{formatSize(info.length)}</strong></span></div>}

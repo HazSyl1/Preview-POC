@@ -14,6 +14,29 @@ public sealed record EmailPreviewResult(
 
 public sealed class EmailPreviewService
 {
+    public async Task<byte[]> GetMimeAsync(FileInfoRecord file, IFileSource source, CancellationToken cancellationToken)
+    {
+        await using var input = await source.OpenReadAsync(file, cancellationToken);
+        if (Path.GetExtension(file.Name).Equals(".eml", StringComparison.OrdinalIgnoreCase))
+        {
+            using var original = new MemoryStream();
+            await input.CopyToAsync(original, cancellationToken);
+            return original.ToArray();
+        }
+
+        try
+        {
+            using var message = Load(input, Path.GetExtension(file.Name));
+            using var eml = new MemoryStream();
+            message.Save(eml, SaveOptions.DefaultEml);
+            return eml.ToArray();
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException and not OutOfMemoryException)
+        {
+            throw new InvalidDataException("The email could not be converted to MIME", ex);
+        }
+    }
+
     public async Task<EmailPreviewResult> GetAsync(FileInfoRecord file, IFileSource source, CancellationToken cancellationToken)
     {
         await using var stream = await source.OpenReadAsync(file, cancellationToken);

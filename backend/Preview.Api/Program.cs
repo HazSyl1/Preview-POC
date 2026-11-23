@@ -93,6 +93,22 @@ app.MapGet("/api/file/info/{**blobName}", async (string blobName, IFileSource so
     catch (RequestFailedException ex) when (ex.Status == 404) { return Results.NotFound(new { error = "File not found" }); }
 });
 
+app.MapGet("/api/file/download/{**blobName}", async (string blobName, IFileSource source, HttpContext http) =>
+{
+    try
+    {
+        var file = await source.GetInfoAsync(blobName, http.RequestAborted);
+        if (file is null) return Results.NotFound(new { error = "File not found" });
+        if (!PreviewTypes.TryGet(file.Name, out _, out var contentType))
+            return Results.BadRequest(new { error = "Unsupported file type" });
+
+        var stream = await source.OpenReadAsync(file, http.RequestAborted);
+        return Results.File(stream, contentType, fileDownloadName: Path.GetFileName(file.Name), enableRangeProcessing: stream.CanSeek);
+    }
+    catch (ArgumentException) { return Results.BadRequest(new { error = "Invalid file name" }); }
+    catch (RequestFailedException ex) when (ex.Status == 404) { return Results.NotFound(new { error = "File not found" }); }
+});
+
 app.MapGet("/api/file/preview-html/{**blobName}", async (string blobName, IFileSource source, HtmlPreviewService previews, HttpContext http) =>
 {
     try
@@ -135,6 +151,22 @@ app.MapGet("/api/file/preview-email/{**blobName}", async (string blobName, IFile
     catch (ArgumentException) { return Results.BadRequest(new { error = "Invalid file name or email" }); }
     catch (InvalidDataException) { return Results.BadRequest(new { error = "The email could not be parsed" }); }
     catch (RequestFailedException ex) when (ex.Status == 404) { return Results.NotFound(new { error = "File not found" }); }
+});
+
+app.MapGet("/api/file/email-mime/{**blobName}", async (string blobName, IFileSource source, EmailPreviewService previews, HttpContext http) =>
+{
+    try
+    {
+        var file = await source.GetInfoAsync(blobName, http.RequestAborted);
+        if (file is null) return Results.NotFound(new { error = "File not found" });
+        if (!PreviewTypes.TryGet(file.Name, out var kind, out _) || kind != "email")
+            return Results.BadRequest(new { error = "Only email files can be opened in Outlook" });
+        var eml = await previews.GetMimeAsync(file, source, http.RequestAborted);
+        return Results.File(eml, "message/rfc822");
+    }
+    catch (ArgumentException) { return Results.BadRequest(new { error = "Invalid file name or email" }); }
+    catch (InvalidDataException) { return Results.BadRequest(new { error = "The email could not be converted to MIME" }); }
+    catch (RequestFailedException ex) when (ex.Status == 404) { return Results.NotFound(); }
 });
 
 app.MapGet("/api/file/preview-text/{**blobName}", async (string blobName, IFileSource source, TextPreviewService previews, HttpContext http) =>

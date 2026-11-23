@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap');
 
 .preview-sizes{display:flex;flex-wrap:wrap;gap:8px 22px;padding:10px 22px;border-bottom:1px solid #edf0e9;background:#f8faf7;color:#66766b;font-size:12px}.preview-sizes strong{color:#294d34;font-weight:700}
+.download-original{display:flex;justify-content:flex-end;padding:10px 22px;border-bottom:1px solid #edf0e9}
 
 .preview-actions{align-items:center;flex-wrap:wrap}.preview-mode{border:1px solid #cad9cb;background:#fff;color:#42614c;border-radius:7px;padding:7px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}.preview-mode.active{background:#e7f0e6;border-color:#9dbba2;color:#24543a}.preview-mode:focus-visible{outline:3px solid #96bd9d;outline-offset:2px}
 .html-preview{flex:1;display:flex;flex-direction:column;background:#e9ece8;min-height:580px}.html-stats{display:flex;flex-wrap:wrap;gap:8px;padding:12px 18px;border-bottom:1px solid #dce5da;background:#f8faf7}.html-stats span{display:flex;flex-direction:column;gap:2px;min-width:105px;padding:8px 12px;border:1px solid #e0e9df;border-radius:8px;background:#fff;color:#718376;font-size:11px}.html-stats strong{color:#284b34;font-size:13px}.html-stats small{color:#8a9a8d;font-size:10px}.html-frame{display:block;flex:1;width:100%;min-height:600px;border:0;background:#fff}

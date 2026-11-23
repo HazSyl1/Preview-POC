@@ -18,6 +18,12 @@ Office files are loaded as streams by the ASP.NET backend and converted with the
 
 The HTML conversion exports the complete document: all Word pages, Excel worksheets, and PowerPoint slides. Large HTML responses are held in memory because the POC returns HTML inside JSON; outputs over 100 MiB return HTTP 413.
 
+### Outlook on the web draft POC
+
+The local `.env.local` contains the Entra client and tenant IDs for the registered React SPA. It is ignored by Git. The app uses MSAL popup sign-in with delegated `User.Read` and `Mail.ReadWrite` permissions, converts `.msg` files to MIME with Aspose.Email, posts the MIME message to Microsoft Graph `/me/messages`, and opens the returned draft `webLink`. `.eml` content is sent as MIME directly. This creates a draft copy in the signed-in mailbox; it does not send the message or change the original stored file. Use only test email files and a test mailbox. In Aspose.Email evaluation mode, attachment preservation can be limited.
+
+Open the UI at `http://localhost:5175/` so it matches the SPA redirect URI registered in Entra. The API endpoint `/api/file/email-mime/{blobName}` returns MIME for the selected email. This POC calls Graph from the browser; a production app should add FMS authentication and authorization and move Graph token handling to a secure server-side delegated flow.
+
 EML and MSG are loaded with Aspose.Email. Its HTML export embeds inline images; external HTTP/HTTPS image URLs are preserved and loaded directly by the sandboxed React iframe. Scripts and interactive email controls remain blocked. Browsers may block HTTP images when the app is served over HTTPS. For PDF, Aspose.Email creates MHTML in memory and Aspose.Words renders that stream as PDF. Email headers and attachment names are included; attachment contents are not rendered. Both modes report original/output size and conversion time through the same preview endpoints as Office files. Markdown is rendered with raw HTML disabled and remote images blocked. TXT and XML display as text; XML is indented when valid, or shown unchanged with a warning when parsing fails. These previews show the full accepted file content without an extra preview cutoff.
 
 ## Prerequisites
@@ -99,6 +105,8 @@ GET  /api/file/preview/{blobName}
 For an existing PDF, the HTML endpoint returns a note pointing to `/api/file/preview/{blobName}`. Unsupported file types return HTTP 400 and missing files return HTTP 404.
 
 `/api/file/preview-email/{blobName}` returns Aspose.Email metadata, sanitized `bodyHtml`, `bodyText`, `attachmentNames`, and `originalFileSizeBytes`. `/api/file/preview-html/{blobName}` converts Office and email files to HTML with conversion stats. `/api/file/preview/{blobName}` converts Office and email files to PDF with size and timing headers. `/api/file/preview-text/{blobName}` returns `type`, full `content`, `originalFileSizeBytes`, and an optional `parseWarning`.
+
+`/api/file/download/{blobName}` streams the original supported file as an attachment. The preview panel exposes this as **Download original file**; it does not convert or alter the stored file.
 
 ## Project layout
 
